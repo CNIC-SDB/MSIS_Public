@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+</head>
+<body>
+<div class="panel panel-primary">
+    <div class="panel-heading">[[#{organization.name}]]管理 - [[#{organization.name}]]列表
+        <button class="" style="float: right;border-radius:5px;margin-top: -2px"  data-target='#addInstitute' data-toggle='modal'>
+            <strong><a style="float: right;color: black">新增[[#{organization.name}]]</a></strong>
+        </button>
+    </div>
+    <div class="panel-body">
+        <div class="form-inline">
+            <input class="form-control" id="searchName" th:placeholder="'输入'+#{organization.name}+'名称'" type="text"/>
+            <button class="btn btn-primary" id="search">查询</button>
+        </div>
+        <div class="height-20"></div>
+        <table id="user">
+        </table>
+    </div>
+</div>
+
+<!-- 新增院所信息-->
+<div aria-hidden="true" aria-labelledby="addModallabel" class="modal fade" id="addInstitute" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button aria-hidden="true" class="close" data-dismiss="modal" type="button">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="addModallabel">
+                    新增[[#{organization.name}]]信息
+                </h4>
+            </div>
+            <form>
+                <div class="modal-body">
+                    <!--院所中文名称-->
+                    <div class="form-inline">
+                        <div class="row">
+                            <div class="col-md-3 star">
+                                [[#{organization.name}]]中文名称
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" id="cnName" name="cnName" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--院所英文名称-->
+                    <div class="form-inline">
+                        <div class="row">
+                            <div class="col-md-3 star">
+                                [[#{organization.name}]]英文名称
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" id="enName" name="enName" placeholder="创建成功后不可变更"
+                                       type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--管理员名称-->
+                    <div class="form-inline">
+                        <div class="row">
+                            <div class="col-md-3 star">
+                                管理员名称
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" id="username" name="username" placeholder="系统登录账号"
+                                       type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--密码-->
+                    <div class="form-inline">
+                        <div class="row">
+                            <div class="col-md-3 star">
+                                管理员密码
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" id="password" name="password" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--邮箱-->
+                    <div class="form-inline">
+                        <div class="row">
+                            <div class="col-md-3 star">
+                                管理员邮箱
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" id="email" name="email" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--手机号-->
+                    <div class="form-inline">
+                        <div class="row">
+                            <div class="col-md-3">
+                                管理员手机号
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" id="mobile" name="mobile" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <div class="form-inline">
+                        <div class="row">
+                            <div class="col-md-3">
+                                描述
+                            </div>
+                            <div class="col-md-4">
+                                <textarea class="form-control" id="description" name="description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal" type="button">关闭
+                </button>
+                <button class="btn btn-primary submit" type="button">
+                    创建[[#{organization.name}]]
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<!-- 编辑院所信息 -->
+<div aria-hidden="true" aria-labelledby="editModallabel" class="modal fade" id="editInstitute" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button aria-hidden="true" class="close" data-dismiss="modal" type="button">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="editModallabel">
+                    编辑[[#{organization.name}]]信息
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <input id="edit-id" name="id" type="hidden">
+                    <input id="oldUsername" name="oldUsername" type="hidden">
+                    <!--院所中文名称-->
+                    <div class="form-inline">
+                        <div class="row">
+                            <div class="col-md-3">
+                                [[#{organization.name}]]名称
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" id="edit-cnName" name="cnName" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--院所英文名称-->
+                    <div class="form-inline">
+                        <div class="row">
+                            <div class="col-md-3">
+                                [[#{organization.name}]]英文名称
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" id="edit-enName" name="enName" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--用户名称-->
+                    <div class="form-inline">
+                        <div class="row">
+                            <div class="col-md-3">
+                                管理员名称
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" id="edit-username" name="username" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--密码-->
+                    <div class="form-inline">
+                        <div class="row">
+                            <div class="col-md-3">
+                                管理员密码
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" id="edit-password" name="password" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--邮箱-->
+                    <div class="form-inline">
+                        <div class="row">
+                            <div class="col-md-3">
+                                管理员邮箱
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" id="edit-email" name="email" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--手机号-->
+                    <div class="form-inline">
+                        <div class="row">
+                            <div class="col-md-3">
+                                管理员手机号
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" id="edit-mobile" name="mobile" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <div class="form-inline">
+                        <div class="row">
+                            <div class="col-md-3">
+                                描述
+                            </div>
+                            <div class="col-md-4">
+                                <textarea class="form-control" id="edit-description" name="description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal" type="button">关闭
+                </button>
+                <button class="btn btn-primary submit" type="submit">
+                    提交更改
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<!-- 删除院所信息-->
+<div aria-hidden="true" aria-labelledby="deleteModallabel" class="modal fade" id="deleteInstitute" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button aria-hidden="true" class="close" data-dismiss="modal" type="button">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="deleteModallabel">
+                    删除[[#{organization.name}]]信息
+                </h4>
+            </div>
+            <div class="modal-body">
+                <strong>[[#{organization.name}]]信息很重要，确认要删除么？</strong>
+                <input id="delete-enName" type="hidden">
+                <input id="delete-username" type="hidden">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal" type="button">取消
+                </button>
+                <button class="btn btn-primary submit" type="button">
+                    确认删除
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+</body>
+
+<script th:inline="javascript">
+    let $institute = $("#user");
+
+    // 表格刷新
+    $("#search").on("click", function () {
+        $institute.bootstrapTable('refreshOptions', {
+            pageNumber: 1
+        });
+    });
+
+    // 新增院所表单验证
+    let validateAdd = $("#addInstitute form").validate({
+        onkeyup: false,
+        rules: {
+            cnName: {
+                required: true,
+                remote: {
+                    url: "/manage/user/validateCnName",
+                    type: "POST",
+                    dataType: "JSON",
+                    data: {
+                        "cnName": function () {
+                            return $("#cnName").val()
+                        }
+                    }
+                }
+            },
+            enName: {
+                required: true,
+                remote: {
+                    url: "/manage/user/validateEnName",
+                    type: "POST",
+                    dataType: "JSON",
+                    data: {
+                        "enName": function () {
+                            return $("#enName").val()
+                        }
+                    }
+                }
+            },
+            username: {
+                required: true,
+                remote: {
+                    url: "/manage/user/validateUsername",
+                    type: "POST",
+                    dataType: "JSON",
+                    data: {
+                        "username": function () {
+                            return $("#addInstitute #username").val()
+                        }
+                    }
+                }
+            },
+            password: "required",
+            email: {
+                required: true,
+                email: true
+            },
+            mobile: {
+                isPhoneNum: true
+            }
+        },
+        messages: {
+            cnName: {
+                required: "请输入" + [[#{organization.name}]] + "中文名称",
+                remote: "此" + [[#{organization.name}]] + "名称已存在"
+            },
+            enName: {
+                required: "请输入" + [[#{organization.name}]] + "英文名称",
+                remote: "此英文名称已存在"
+            },
+            username: {
+                required: "请输入" + [[#{organization.name}]] + "管理员名称",
+                remote: "此" + [[#{organization.name}]] + "管理员名称已存在"
+            },
+            password: "请输入密码",
+            email: {
+                required: "请输入邮箱",
+                email: "请输入正确邮箱"
+            }
+        }
+    });
+    let validateEdit = $("#editInstitute form").validate({
+        onkeyup: false,
+        rules: {
+            cnName: {
+                required: true,
+                remote: {
+                    url: "/manage/user/validateCnName",
+                    type: "POST",
+                    dataType: "JSON",
+                    data: {
+                        "cnName": function () {
+                            return $("#cnName").val()
+                        }
+                    }
+                }
+            },
+            enName: {
+                required: true,
+                remote: {
+                    url: "/manage/user/validateEnName",
+                    type: "POST",
+                    dataType: "JSON",
+                    data: {
+                        "enName": function () {
+                            return $("#enName").val()
+                        }
+                    }
+                }
+            },
+            username: {
+                required: true,
+                remote: {
+                    url: "/manage/user/validateUsername",
+                    type: "POST",
+                    dataType: "JSON",
+                    data: {
+                        "username": function () {
+                            return $("#editInstitute #edit-username").val()
+                        },
+                        "id": function () {
+                            return $("#editInstitute #edit-id").val()
+                        }
+                    }
+                }
+            },
+            email: {
+                required: true,
+                email: true
+            },
+            mobile: {
+                isPhoneNum: true
+            }
+        },
+        messages: {
+            cnName: {
+                required: "请输入" + [[#{organization.name}]] + "中文名称",
+                remote: "此" + [[#{organization.name}]] + "名称已存在"
+            },
+            enName: {
+                required: "请输入" + [[#{organization.name}]] + "英文名称",
+                remote: "此英文名称已存在"
+            },
+            username: {
+                required: "请输入" + [[#{organization.name}]] + "管理员名称",
+                remote: "此" + [[#{organization.name}]] + "管理员名称已存在"
+            },
+            email: {
+                required: "请输入邮箱",
+                email: "请输入正确邮箱"
+            }
+        }
+    });
+
+    // 新增院所
+    $("#addInstitute .submit").on("click", function () {
+        if (validateAdd.form()) {
+            msisAPP.layerOpen();
+            $.ajax({
+                url: "/manage/user/save",
+                type: "POST",
+                dataType: "JSON",
+                data: $(validateAdd.currentForm).serialize(),
+                success: function (result) {
+                    $('#addInstitute').trigger("click");
+                    $("#search").trigger("click")
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                    msisAPP.layerClose();
+                }
+            })
+        }
+    });
+    // 编辑院所
+    $("#editInstitute .submit").on("click", function () {
+        if (validateEdit.form()) {
+            $("#edit-enName").removeAttr("disabled");
+            let data = $(validateEdit.currentForm).serialize();
+            $("#edit-enName").attr("disabled", "disabled");
+            msisAPP.layerOpen();
+            $.ajax({
+                url: "/manage/user/update",
+                type: "POST",
+                dataType: "JSON",
+                data: data,
+                success: function (result) {
+                    debugger
+                    $('#editInstitute').trigger("click");
+                    $("#search").trigger("click")
+                },
+                complete: function (XMLHttpRequest, textStatus) {
+                    msisAPP.layerClose();
+                }
+            })
+        }
+    });
+    // 删除院所
+    $("#deleteInstitute .submit").on("click", function () {
+        msisAPP.layerOpen();
+        $.ajax({
+            url: "/manage/user/delete",
+            type: "POST",
+            dataType: "JSON",
+            data: {
+                "enName": $("#delete-enName").val(),
+                "username": $("#delete-username").val()
+            },
+            success: function (result) {
+                $('#deleteInstitute').trigger("click");
+                $("#search").trigger("click")
+            },
+            complete: function (XMLHttpRequest, textStatus) {
+                msisAPP.layerClose();
+            }
+        })
+    });
+
+    // 初始化页面表格
+    $(function () {
+        $institute.bootstrapTable({
+            method: "post",
+            pagination: true,
+            pageNumber: 1,
+            pageSize: 20,
+            url: "/manage/user/pageList",
+            contentType: "application/x-www-form-urlencoded",
+            queryParams: function (params) {
+                params["cnName"] = $.trim($("#searchName").val());
+                return params;
+            },
+            columns: [
+                {
+                    title: "序号",//标题  可不加
+                    align: "center",
+                    class: "col-md-1",
+                    formatter: function (value, row, index) {
+                        return index + 1;
+                    }
+                }, {
+                    field: "cnName",
+                    title: [[#{organization.name}]] + "名称",
+                    class: "col-md-5",
+                    align: "center",
+                    valign: "middle"
+                }, {
+                    field: "enName",
+                    title: "英文名称",
+                    class: "col-md-2",
+                    align: "center",
+                    valign: "middle"
+                }, {
+                    field: "description",
+                    title: "描述",
+                    class: "col-md-3",
+                    align: "center",
+                    valign: "middle",
+                }, {
+                    field: "username",
+                    visible: false
+                }, {
+                    field: "email",
+                    visible: false
+                }, {
+                    field: "mobile",
+                    visible: false
+                }, {
+                    field: "operate",
+                    title: "操作",
+                    class: "col-md-1",
+                    align: "center",
+                    valign: "middle",
+                    events: {
+                        "click .edit": function (e, value, row, index) {
+                            $("#edit-id").val(row.id);
+                            $("#edit-cnName").val(row.cnName);
+                            $("#edit-enName").val(row.enName);
+                            $("#edit-username").val(row.username);
+                            $("#oldUsername").val(row.username);
+                            $("#edit-email").val(row.email);
+                            $("#edit-mobile").val(row.mobile);
+                            $("#edit-description").val(row.description);
+                        },
+                        "click .remove": function (e, value, row, index) {
+                            $("#delete-enName").val(row.enName);
+                            $("#delete-username").val(row.username);
+                        }
+                    },
+                    formatter: function (value, row, index) {
+                        return [
+                            "<a class='edit' href='javascript:void(0)' title='编辑'>",
+                            "<i class='fa fa-edit' data-toggle='modal' data-target='#editInstitute'>编辑</i>",
+                            "</a>  "/*,
+                            "<a class='remove' href='javascript:void(0)' title='删除'>",
+                            "<i class='fa fa-trash' data-toggle='modal' data-target='#deleteInstitute'>删除</i>",
+                            "</a>"*/
+                        ].join("")
+                    }
+                }
+            ]
+        });
+    })
+
+    // 切换弹窗清除校验、数据等信息
+    $("#editInstitute").on("show.bs.modal", function () {
+        $("#edit-enName").attr("disabled", "disabled")
+    });
+
+    $("#editInstitute,#addInstitute").on("hide.bs.modal", function () {
+        $("#edit-enName").removeAttr("disabled");
+        validateAdd.resetForm();
+        validateEdit.resetForm();
+    });
+</script>
+</html>

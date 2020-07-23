@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>统计节点分组</title>
+</head>
+<body>
+<div class="panel panel-primary">
+    <div class="panel-heading">站点群管理 - 统计节点分组
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-3">
+                <ul class="ztree" id="zTreeNode"></ul>
+            </div>
+            <div class="col-md-9">
+                <!--已存在的关系-->
+                <div style="min-height: 200px">
+                    <span>已选择日志列表</span>-<span><strong id="currentGroup"></strong></span>
+                    <div class="height-20"></div>
+                    <table id="selected"></table>
+                    <button id="del">删除</button>
+                </div>
+                <div class="height-20"></div>
+                <!--未存在的关系-->
+                <div style="min-height: 800px">
+                    <span>所有日志列表</span>
+                    <div class="height-20"></div>
+                    <table id="all"></table>
+                    <button id="add">添加</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script th:inline="javaScript" type="text/javascript">
+
+    let treeObj, timer, sleep = 200;
+    let $currentGroup = $("#currentGroup");
+    let initzTree = function () {
+        $.ajax({
+            url: "/manage/group/groupTree",
+            type: "POST",
+            dataType: "JSON",
+            success: function (result) {
+                // 初始化树
+                treeObj = $.fn.zTree.init($("#zTreeNode"), zTreeSetting, result);
+            }
+        });
+    };
+    let zTreeSetting = {
+        data: {
+            key: {
+                name: "cnName"
+            }
+        },
+        // 回调函数
+        callback: {
+            // 节点捕获单击之前
+            beforeClick: function (treeId, treeNode, clickFlag) {
+                if (timer) {
+                    clearTimeout(timer);
+                }
+                timer = setTimeout(function () {
+                    treeObj.selectNode(treeNode);
+                    treeObj.setting.callback.onClick(null, treeId, treeNode, clickFlag)
+                }, sleep);
+                return false;
+            },
+            // 节点捕获单击回调
+            onClick: function (event, treeId, treeNode, clickFlag) {
+                gid = treeNode.id;
+                $currentGroup.text("");
+                $currentGroup.text(treeNode.cnName);
+                $currentGroup.attr("currentGroupId", treeNode.id);
+                refreshSelectedTable();
+            },
+            // 节点捕获双击之前
+            beforeDblClick: function (treeId, treeNode, clickFlag) {
+                if (timer) {
+                    clearTimeout(timer);
+                }
+                return true;
+            }
+        }
+    };
+
+    var $selectedTable = $("#selected");
+    var $allTable = $("#all");
+    var tableSetting = {
+        pagination: false,
+        url: "/manage/site/list",
+        method: "POST",
+        checkbox: true,// 复选框
+        clickToSelect: true,// 点击行选中复选框
+        checkboxHeader: true,// 显示全选复选框
+        columns: [
+            {
+                checkbox: true,
+                class: "col-md-1"
+            },
+            {
+                field: "id",
+                title: "id",
+                align: "center",
+                valign: "top",
+                visible: false
+            }, {
+                field: "cnName",
+                title: "日志名称",
+                align: "center",
+                class: "col-md-6",
+                valign: "top"
+            }, {
+                field: "instituteName",
+                title: "" + [[#{organization.name}]] + "单位",
+                align: "center",
+                class: "col-md-4",
+                valign: "top"
+            }, {
+                field: "format",
+                title: "日志类型",
+                align: "center",
+                class: "col-md-1",
+                valign: "top"
+            }
+        ]
+    };
+    var gid;
+
+    function initTable() {
+        $selectedTable.bootstrapTable($.extend({}, tableSetting, {url: ""}));
+        $allTable.bootstrapTable($.extend({}, tableSetting, {
+            queryParams: function (queryParams) {
+                // queryParams["gid"]=classId;
+                queryParams["gid"] = 1;
+                return queryParams;
+            }
+        }));
+    }
+
+    function refreshSelectedTable() {
+        $selectedTable.bootstrapTable("refreshOptions", {
+            url: "/manage/site/list",
+            queryParams: function (queryParams) {
+                queryParams["gid"] = gid;
+                return queryParams;
+            }
+        });
+    }
+
+
+    function selectedIds($bootstrapTable) {
+        let arrayObj = $bootstrapTable.bootstrapTable("getSelections");
+        let ids = [];
+        $.each(arrayObj, function (index, value) {
+            ids.push(value.id);
+        });
+        return ids;
+    }
+
+    // 按钮方法
+    // 删除关系
+    $("#del").on("click", function () {
+        let ids = selectedIds($selectedTable);
+        if (gid === undefined) {
+            $.myNotify.warning("请选择分组");
+            return;
+        }
+        if (ids.length === 0) {
+            $.myNotify.warning("请选择日志");
+            return;
+        }
+        $.ajax({
+            url: "/manage/site/deleteGroupSite",
+            type: "POST",
+            // dataType: "JSON",
+            data: {
+                ids: ids,
+                gid: gid
+            },
+            traditional: true,
+            success: function (result) {
+
+                refreshSelectedTable();
+            }
+        })
+    });
+    // 新增关系
+    $("#add").on("click", function () {
+        let ids = selectedIds($allTable);
+        let difIds = differentIds(allTableIds($selectedTable), ids);
+        if (gid === undefined) {
+            $.myNotify.warning("请选择分组");
+            return;
+        }
+        if (ids.length === 0) {
+            $.myNotify.warning("请选择日志");
+            return;
+        }
+        if (difIds.length === 0) {
+            $.myNotify.warning("日志已经全部存在该组下");
+            return;
+        }
+        $.ajax({
+            url: "/manage/site/saveGroupSite",
+            type: "POST",
+            // dataType: "JSON",
+            data: {
+                ids: difIds,
+                gid: gid
+            },
+            traditional: true,
+            success: function (result) {
+                refreshSelectedTable();
+            }
+        })
+    });
+
+
+    /**
+     * @param oldIds 原始数组
+     * @param newIds 新增数组
+     * @return [] 新增数组与原始数组不同的部分
+     */
+    function differentIds(oldIds, newIds) {
+        return newIds.filter(function (element) {
+            return oldIds.indexOf(element) === -1;
+        })
+    }
+
+    /**
+     *
+     * @param $bootstrapTable 当前bootstrapTable jQuery对象
+     * @return {Array} 当前表格中所有的id
+     */
+    function allTableIds($bootstrapTable) {
+        let arrayObj = $bootstrapTable.bootstrapTable("getData");
+        let ids = [];
+        $.each(arrayObj, function (index, value) {
+            ids.push(value.id);
+        });
+        return ids;
+    }
+
+    $(function () {
+        initzTree();
+        initTable();
+    });
+</script>
+</html>

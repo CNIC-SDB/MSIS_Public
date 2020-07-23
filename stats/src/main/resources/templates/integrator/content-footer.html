@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<footer id="footer" th:fragment="content-footer">
+    版权所有 中国科学院计算机网络信息中心·大数据部 Copyright © 2008-2030 <a href="http://beian.miit.gov.cn/" target="_blank">备案序号:京ICP备09112257号-34</a>
+    <div id="back-top">
+        <a href="#">
+            <i class="fa fa-chevron-up"></i>
+        </a>
+    </div>
+    <script th:inline="javascript">
+        $("body").on("click", ".href", function () {
+            var href = $(this).attr("href");
+            var param = $("body .groupId").text();
+            href = href + param;
+            // alert(href);
+            $.myAdmin.loadContent(href)
+        });
+    </script>
+</footer>
+</body>
+</html>

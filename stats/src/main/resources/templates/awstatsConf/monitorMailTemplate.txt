@@ -1,0 +1,3 @@
+[(${userCnName})] [(${userTitle})]管理员您好：<br>
+&nbsp;&nbsp;您所管理的站点<strong>[(${siteCnName})]：</strong><a href=[(${url})]>[(${url})]</a>,在过去的"[(${monitorHours})]小时"一直处于异常状态，<br>
+&nbsp;&nbsp;请您及时查看。

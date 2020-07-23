@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>首页</title>
+</head>
+
+<style>
+    .top10 {
+        width: 200px;
+    }
+</style>
+
+<body>
+
+<section class="container homePage" th:fragment="content-wrapper">
+    <div class="row">
+        <!--图表区-->
+        <div class="col-md-8">
+
+            <!--数据访问量统计-->
+            <div class="panel panel-primary">
+                <div class="panel-heading">数据访问量统计</div>
+                <div class="panel-body" id="dataCensus">
+                    <div id="visitorCharts" style="height: 400px; max-width: 800px; margin: 0 auto"></div>
+                </div>
+            </div>
+
+            <!--数据下载量统计-->
+            <div class="panel panel-primary">
+                <div class="panel-heading">数据下载量统计</div>
+                <div class="panel-body">
+                    <div id="bandwidthCharts" style="height: 400px; max-width: 800px; margin: 0 auto"></div>
+                </div>
+            </div>
+
+            <!--用户来源统计-->
+            <div class="panel panel-primary">
+                <div class="panel-heading">用户来源统计</div>
+                <div class="panel-body">
+                    <div id="domain" style="height: 400px; max-width: 800px; margin: 0 auto"></div>
+                </div>
+            </div>
+
+            <!--服务正常率统计-->
+            <div class="panel panel-primary">
+                <div class="panel-heading">服务正常率统计</div>
+                <div class="panel-body">
+                    <div id="serviceRate" style="height: 400px; max-width: 800px; margin: 0 auto"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <!--排名区-->
+        <div class="col-md-4">
+            <!--全站统计-->
+            <div class="ico01_div fadeInUp">
+                <table cellpadding="0" cellspacing="0">
+                    <tbody>
+                    <tr>
+                        <td>
+                            <img height="47" src="/static/img/ico01.png" width="47">
+                        </td>
+                        <td width="10"></td>
+                        <td>
+                            累计访问人次
+                            <br>
+                            <strong class="number-thousands" th:text="${homePageReport.visits}"></strong>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="ico02_div fadeInUp">
+                <table cellpadding="0" cellspacing="0">
+                    <tbody>
+                    <tr>
+                        <td>
+                            <img height="49" src="/static/img/ico02.png" width="47">
+                        </td>
+                        <td width="10"></td>
+                        <td>
+                            累计网页访问数
+                            <br>
+                            <strong class="number-thousands" th:text="${homePageReport.pages}"></strong>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="ico03_div fadeInUp">
+                <table cellpadding="0" cellspacing="0">
+                    <tbody>
+                    <tr>
+                        <td>
+                            <img height="49" src="/static/img/ico03.png" width="47">
+                        </td>
+                        <td width="10"></td>
+                        <td>
+                            累计下载量
+                            <br>
+                            <strong class="number-GB" th:text="${homePageReport.bandwidth}"></strong>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!--上月访问量前十-->
+            <div class="panel panel-primary animated fadeInUp ">
+                <div class="panel-heading">上月访问量排名</div>
+                <div class="panel-body">
+                    <ul th:each="visit :${homePageReport.top10Visit}">
+                        <li>
+                            <span th:text="${visitStat.index+1}"></span>
+                            <a class="top10" href="javascript:void(0)"
+                               th:attr="title=${visit.gname},param=('gid='+${visit.gid})"
+                               th:text="(${#strings.length(visit.gname)>10} ? ${#strings.substring(visit.gname,0,10) +'...'} : ${visit.gname})">></a>
+                            <strong class="number-thousands" style="float: right" th:text="${visit.value}"></strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!--上月下载量前十-->
+            <div class="panel panel-primary animated fadeInUp ">
+                <div class="panel-heading">上月下载量排名</div>
+                <div class="panel-body">
+                    <ul th:each="bandwidth :${homePageReport.top10Bandwidth}">
+                        <li>
+
+                            <span th:text="${bandwidthStat.index+1}"></span>
+                            <a class="top10" href="javascript:void(0)"
+                               th:attr="title=${bandwidth.gname},param=('gid='+${bandwidth.gid})"
+                               th:text="(${#strings.length(bandwidth.gname)>10} ? ${#strings.substring(bandwidth.gname,0,10) +'...'} : ${bandwidth.gname})">></a>
+                            <strong class="number-GB" style="float: right" th:text="${bandwidth.value}"></strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!--上月服务正常率前十-->
+            <div class="panel panel-primary animated fadeInUp ">
+                <div class="panel-heading">上月服务正常率排名</div>
+                <div class="panel-body">
+                    <ul th:each="serviceRate :${homePageReport.top10Status}">
+                        <li>
+                            <span th:text="${serviceRateStat.index+1}"></span>
+                            <a class="top10" href="javascript:void(0)"
+                               th:attr="title=${serviceRate.gname},param=('gid='+${serviceRate.gid})"
+                               th:text="(${#strings.length(serviceRate.gname)>10} ? ${#strings.substring(serviceRate.gname,0,10) +'...'} : ${serviceRate.gname})">></a>
+                            <strong style="float: right" th:text="${serviceRate.value}+'%'"></strong>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+
+        // 抽取全站访问量 下载量为ajax请求
+        /*$.ajax({
+            url: "/dayStatic",
+            type: "POST",
+            success:function (homePageReport) {
+                var listVisit = homePageReport.visitDaily;
+                $.each(listVisit, function (index) {
+                    var time = listVisit[index][0];
+                    var year = Math.floor(time / 10000);
+                    var month = Math.floor(time % 10000 / 100);
+                    var day = time % 10000 % 100;
+                    listVisit[index][0] = Date.UTC(year, month - 1, day);
+                });
+                Highcharts.chart('visitorCharts', {
+                    chart: {
+                        zoomType: 'x'
+                    },
+                    // boost: {
+                    //     useGPUTranslations: true
+                    // },
+                    title: {
+                        text: '数据访问量统计'
+                    },
+                    xAxis: {
+                        type: 'datetime',
+                        title: {
+                            text: '日期'
+                        },
+                        labels: {
+                            step: 1,
+                            formatter: function () {
+                                return Highcharts.dateFormat('%Y-%m-%d', this.value);
+                            }
+                        }
+
+                    },
+                    yAxis: {
+                        title: {
+                            text: '访问量'
+                        }
+                    },
+                    tooltip: {
+                        valueDecimals: 0,
+                        xDateFormat: '%Y-%m-%d'
+                    },
+                    series: [{
+                        type: 'line',
+                        name: '日访问量',
+                        data: listVisit,
+                        // lineWidth: 0.8
+                    }]
+                });
+
+                var listBandwidth = homePageReport.bandwidthDaily;
+                $.each(listBandwidth, function (index) {
+                    var time = listBandwidth[index][0];
+                    var year = Math.floor(time / 10000);
+                    var month = Math.floor(time % 10000 / 100);
+                    var day = time % 10000 % 100;
+                    listBandwidth[index][0] = Date.UTC(year, month - 1, day);
+                });
+                Highcharts.chart('bandwidthCharts', {
+                    chart: {
+                        zoomType: 'x'
+                    },
+                    // boost: {
+                    //     useGPUTranslations: true
+                    // },
+                    title: {
+                        text: '数据下载量统计'
+                    },
+                    xAxis: {
+                        type: 'datetime',
+                        title: {
+                            text: '日期'
+                        },
+                        labels: {
+                            step: 1,
+                            formatter: function () {
+                                return Highcharts.dateFormat('%Y-%m-%d', this.value);
+                            }
+                        }
+
+                    },
+                    yAxis: {
+                        title: {
+                            text: '下载量'
+                        }
+                    },
+                    // 数据提示框选项
+                    tooltip: {
+                        valueDecimals: 0,
+                        formatter: function () {
+                            var _x = Highcharts.dateFormat('%Y-%m-%d', this.x);
+                            var _y = msisAPP.evolveNumber(this.y, "MB");
+                            _y = msisAPP.thousands(_y);
+                            return "<b>日期：" + _x + "</b><br/>" +
+                                "<b>下载量：" + _y + "MB</b>";
+                        }
+                    },
+                    series: [{
+                        type: 'line',
+                        name: '日下载量',
+                        data: listBandwidth,
+                        // lineWidth: 0.8
+                    }]
+                });
+            }
+        })*/
+
+        // 数据访问量折线图
+        var listVisit = [[${homePageReport.visitDaily}]];
+        $.each(listVisit, function (index) {
+            var time = listVisit[index][0];
+            var year = Math.floor(time / 10000);
+            var month = Math.floor(time % 10000 / 100);
+            var day = time % 10000 % 100;
+            listVisit[index][0] = Date.UTC(year, month - 1, day);
+        });
+        Highcharts.chart('visitorCharts', {
+            chart: {
+                zoomType: 'x'
+            },
+            // boost: {
+            //     useGPUTranslations: true
+            // },
+            title: {
+                text: '数据访问量统计'
+            },
+            xAxis: {
+                type: 'datetime',
+                title: {
+                    text: '日期'
+                },
+                labels: {
+                    step: 1,
+                    formatter: function () {
+                        return Highcharts.dateFormat('%Y-%m-%d', this.value);
+                    }
+                }
+
+            },
+            yAxis: {
+                title: {
+                    text: '访问量'
+                }
+            },
+            tooltip: {
+                valueDecimals: 0,
+                xDateFormat: '%Y-%m-%d'
+            },
+            series: [{
+                type: 'line',
+                name: '日访问量',
+                data: listVisit,
+                // lineWidth: 0.8
+            }]
+        });
+
+        // 数据下载量折线图
+        var listBandwidth = [[${homePageReport.bandwidthDaily}]];
+        $.each(listBandwidth, function (index) {
+            var time = listBandwidth[index][0];
+            var year = Math.floor(time / 10000);
+            var month = Math.floor(time % 10000 / 100);
+            var day = time % 10000 % 100;
+            listBandwidth[index][0] = Date.UTC(year, month - 1, day);
+        });
+        Highcharts.chart('bandwidthCharts', {
+            chart: {
+                zoomType: 'x'
+            },
+            // boost: {
+            //     useGPUTranslations: true
+            // },
+            title: {
+                text: '数据下载量统计'
+            },
+            xAxis: {
+                type: 'datetime',
+                title: {
+                    text: '日期'
+                },
+                labels: {
+                    step: 1,
+                    formatter: function () {
+                        return Highcharts.dateFormat('%Y-%m-%d', this.value);
+                    }
+                }
+
+            },
+            yAxis: {
+                title: {
+                    text: '下载量'
+                }
+            },
+            // 数据提示框选项
+            tooltip: {
+                valueDecimals: 0,
+                formatter: function () {
+                    var _x = Highcharts.dateFormat('%Y-%m-%d', this.x);
+                    var _y = msisAPP.evolveNumber(this.y, "MB");
+                    _y = msisAPP.thousands(_y);
+                    return "<b>日期：" + _x + "</b><br/>" +
+                        "<b>下载量：" + _y + "MB</b>";
+                }
+            },
+            series: [{
+                type: 'line',
+                name: '日下载量',
+                data: listBandwidth,
+                // lineWidth: 0.8
+            }]
+        });
+
+        //用户来源统计
+        var mapDomain = [[${homePageReport.ipDomain}]];
+        var domainArrayData = [];
+        $.each(mapDomain, function (key, value) {
+            var data = {"name": key, "y": value};
+            domainArrayData.push(data);
+        });
+        Highcharts.chart('domain', {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: '用户来源统计'
+            },
+            tooltip: {
+                pointFormat: '<b>数量：</b>{point.y}<br/><b>比率：</b>{point.percentage:.2f}%'
+            },
+            legend: {
+                layout: "vertical",
+                align: "left",
+                verticalAlign: "top",
+                itemMarginBottom: 10,
+                labelFormatter: function () {
+                    return this.name + "(" + this.percentage.toFixed(2) + "%)";
+                }
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        // enabled: false
+                    },
+                    showInLegend: true,
+                    point: {
+                        events: {
+                            legendItemClick: function () {
+                                return false;
+                            }
+                        }
+                    },
+                }
+            },
+            series: [{
+                name: '来源比率',
+                colorByPoint: true,
+                data: domainArrayData
+            }]
+        });
+
+        // 服务正常率统计
+        var mapServiceRate = [[${homePageReport.serviceRate}]];
+        var serviceRateArrayData = [];
+        $.each(mapServiceRate, function (key, value) {
+            var data = {"name": key, "y": value};
+            serviceRateArrayData.push(data);
+        });
+        Highcharts.chart('serviceRate', {
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+
+            title: {
+                text: '服务正常率统计'
+            },
+            tooltip: {
+                pointFormat: '<b>数量：</b>{point.y}<br/><b>比率：</b>{point.percentage:.2f}%'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        // enabled: false
+                    },
+                    showInLegend: true,
+                    point: {
+                        events: {
+                            legendItemClick: function () {
+                                return false;
+                            }
+                        }
+                    },
+                }
+            },
+            legend: {
+                layout: "vertical",
+                align: "left",
+                verticalAlign: "top",
+                itemMarginBottom: 10,
+                labelFormatter: function () {
+                    return this.name + "(" + this.percentage.toFixed(2) + "%)";
+                },
+            },
+            series: [{
+                name: '服务正常率',
+                colorByPoint: true,
+                data: serviceRateArrayData
+            }]
+        });
+
+        //排名跳转
+        $("div.panel-body ul li").on("click", function (e) {
+            let $this = $(this);
+            let groupID = $this.find("a").attr("param").split("=")[1];
+            var href = "#integrator/dataStat/synthesize?groupID=" + groupID;
+            $.myAdmin.loadContent(href);
+            $("#groupsList").val(groupID);
+            e.preventDefault();
+        });
+        // 格式化数字显示
+        msisAPP.numberFormat();
+    </script>
+</section>
+
+
+</body>
+</html>

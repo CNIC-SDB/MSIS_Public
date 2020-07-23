@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        .formatPersonalized {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="panel panel-primary">
+    <div class="panel-heading">站点管理 - 站点列表
+        <shiro:hasRole name="ROLE_ADMIN">
+            <button class=""
+                style="float: right;border-radius:5px;margin-top: -2px" data-target='#addSite' data-toggle='modal' href="javascript:void(0)">
+            <strong><a
+                    data-target='#addInstitute' data-toggle='modal'
+                style="float: right;color: black">新增站点</a></strong></button>
+        </shiro:hasRole>
+    </div>
+    <div class="panel-body">
+        <div class="form-inline">
+            <input class="form-control" id="searchName" placeholder="输入站点名称" type="text"/>
+            <button class="btn btn-primary" id="search">查询</button>
+        </div>
+        <div class="height-20"></div>
+        <table id="site">
+        </table>
+    </div>
+</div>
+<div hidden id="deleteHTML" shiro:hasRole="ROLE_ADMIN">
+    <a class="remove" href="javascript:void(0)" title="删除"><i class="fa fa-trash" data-target="#deleteSite"
+                                                              data-toggle="modal"> &nbsp;</i></a>
+</div>
+<!-- 新增站点信息-->
+<div aria-hidden="true" aria-labelledby="addModalLabel" class="modal fade" id="addSite" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button aria-hidden="true" class="close" data-dismiss="modal" type="button">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="addModalLabel">
+                    新增站点信息
+                </h4>
+            </div>
+            <form>
+                <div class="modal-body">
+                    <!--分割标头-站点基础信息-->
+                    <div class="row">
+                        <div class="col-md-12 text-center slice ">
+                            <span>基本信息</span>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--站点名称_中文-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3 star">
+                                站点中文名称
+                            </div>
+                            <div class="col-md-5">
+                                <input class="form-control" name="cnName" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--站点名称_英文-->
+                    <div>
+                         <div class="row">
+                             <div class="col-md-3 star">
+                                 站点英文名称
+                             </div>
+                             <div class="col-md-5">
+                                 <input class="form-control" name="enName" type="text">
+                             </div>
+                         </div>
+                     </div>
+                    <div class="height-20"></div>
+                    <!--所属院所-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3 star">
+                                所属[[#{organization.name}]]
+                            </div>
+                            <div class="col-md-5">
+                                <select class="form-control" name="gid"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--所属领域-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3 star">
+                                所属领域
+                            </div>
+                            <div class="col-md-5">
+                                <select class="form-control" name="subject"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--描述-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                站点描述
+                            </div>
+                            <div class="col-md-5">
+                                <textarea class="form-control" name="description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+
+
+                    <!--分割标头-站点统计信息-->
+                    <div class="row">
+                        <div class="col-md-12 text-center slice">
+                            <span>站点统计信息</span>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--站点URI-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3 star">
+                                日志URI
+                            </div>
+                            <div class="col-md-5">
+                                <input class="form-control" name="uri" placeholder="唯一标识，例：www.msis" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--站点日志格式-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3 star">
+                                日志格式
+                            </div>
+                            <div class="col-md-5">
+                                <select class="form-control" name="format">
+                                    <option value="">请选择日志格式</option>
+                                    <option value="APACHE">APACHE</option>
+                                    <option value="TOMCAT">TOMCAT</option>
+                                    <option value="IIS">IIS</option>
+                                    <option value="FTP">FTP</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--自定义日志格式-->
+                    <div class="formatPersonalized">
+                        <div>
+                            <div class="row">
+                                <div class="col-md-3 star">
+                                    个性化日志格式
+                                </div>
+                                <div class="col-md-5">
+                                    <input class="form-control" name="formatPersonalized" type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="height-20"></div>
+                    </div>
+                    <!--站点日志文件存放位置-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3 star">
+                                服务器日志文件
+                            </div>
+                            <div class="col-md-5">
+                                <input class="form-control" name="logfiles" placeholder="匹配模式，例：access*.log"
+                                       type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--站点统计信息备注说明-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                备注
+                            </div>
+                            <div class="col-md-5">
+                                <textarea class="form-control" name="statsNote"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+
+                    <!--分割标头-站点监控信息-->
+                    <div class="row">
+                        <div class="col-md-12 text-center slice">
+                            <span>站点监控信息</span>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--监控点名称-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3 star">
+                                监控点名称
+                            </div>
+                            <div class="col-md-5">
+                                <input class="form-control" name="mName" placeholder="监控名称，例：msis"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--监控点URL-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3 star">
+                                监控点URL
+                            </div>
+                            <div class="col-md-5">
+                                <input class="form-control" name="mUri" placeholder="监控地址，例：www.msis.cn"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--监控点描述-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                描述
+                            </div>
+                            <div class="col-md-5">
+                                <textarea class="form-control" name="mDescription"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" data-dismiss="modal" type="button">关闭
+                    </button>
+                    <button class="btn btn-primary submit" type="button">
+                        新增站点
+                    </button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<!-- 编辑站点基本信息 -->
+<div aria-hidden="true" aria-labelledby="editModalLabel" class="modal fade" id="editSite" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button aria-hidden="true" class="close" data-dismiss="modal" type="button">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="editModalLabel">
+                    编辑站点信息
+                </h4>
+            </div>
+            <form class="form-group">
+                <input name="id" type="hidden"/>
+                <div class="modal-body">
+                    <!--分割标头-站点基础信息-->
+                    <div class="row">
+                        <div class="col-md-12 text-center slice ">
+                            <span>基本信息</span>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--站点名称_中文-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                站点中文名称
+                            </div>
+                            <div class="col-md-5">
+                                <input class="form-control" name="cnName" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--站点名称_英文-->
+                    <div>
+                         <div class="row">
+                             <div class="col-md-3">
+                                 站点英文名称
+                             </div>
+                             <div class="col-md-5">
+                                 <input class="form-control" name="enName" type="text">
+                             </div>
+                         </div>
+                     </div>
+                    <div class="height-20"></div>
+                    <!--所属院所-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                所属[[#{organization.name}]]
+                            </div>
+                            <div class="col-md-5">
+                                <select class="form-control" name="gid"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--所属领域-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                所属领域
+                            </div>
+                            <div class="col-md-5">
+                                <select class="form-control" name="subject"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--描述-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                站点描述
+                            </div>
+                            <div class="col-md-5">
+                                <textarea class="form-control" name="description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+
+
+                    <!--分割标头-站点统计信息-->
+                    <div class="row">
+                        <div class="col-md-12 text-center slice">
+                            <span>站点统计信息</span>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--站点URI-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                日志URI
+                            </div>
+                            <div class="col-md-5">
+                                <input class="form-control" name="uri" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--站点日志格式-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                日志格式
+                            </div>
+                            <div class="col-md-5">
+                                <select class="form-control" name="format">
+                                    <option value="">请选择日志格式</option>
+                                    <option value="APACHE">APACHE</option>
+                                    <option value="TOMCAT">TOMCAT</option>
+                                    <option value="IIS">IIS</option>
+                                    <option value="FTP">FTP</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--站点日志自定义-->
+                    <div class="formatPersonalized">
+                        <div>
+                            <div class="row">
+                                <div class="col-md-3">
+                                    个性化日志格式
+                                </div>
+                                <div class="col-md-5">
+                                    <input class="form-control" name="formatPersonalized" type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="height-20"></div>
+                    </div>
+                    <!--站点类型-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                服务器日志文件
+                            </div>
+                            <div class="col-md-5">
+                                <input class="form-control" name="logfiles" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--站点统计信息备注说明-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                备注
+                            </div>
+                            <div class="col-md-5">
+                                <textarea class="form-control" name="statsNote"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+
+                    <!--分割标头-站点监控信息-->
+                    <div class="row">
+                        <div class="col-md-12 text-center slice">
+                            <span>站点监控信息</span>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--监控点ID-->
+                    <input name="mid" type="hidden">
+                    <!--监控点名称-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                监控点名称
+                            </div>
+                            <div class="col-md-5">
+                                <input class="form-control" name="mName"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--监控点URL-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                监控点URL
+                            </div>
+                            <div class="col-md-5">
+                                <input class="form-control" name="mUri"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="height-20"></div>
+                    <!--监控点描述-->
+                    <div>
+                        <div class="row">
+                            <div class="col-md-3">
+                                描述
+                            </div>
+                            <div class="col-md-5">
+                                <textarea class="form-control" name="mDescription"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" data-dismiss="modal" type="button">关闭
+                    </button>
+                    <button class="btn btn-primary submit" type="button">
+                        提交修改
+                    </button>
+                </div>
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+<!-- 删除站点信息-->
+<div aria-hidden="true" aria-labelledby="deleteModalLabel" class="modal fade" id="deleteSite" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button aria-hidden="true" class="close" data-dismiss="modal" type="button">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="deleteModalLabel">
+                    删除站点信息
+                </h4>
+            </div>
+            <div class="modal-body">
+                <strong>站点信息很重要，确认要删除么？</strong>
+                <input id="delete-id" type="hidden">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal" type="button">取消
+                </button>
+                <button class="btn btn-primary submit" type="button">
+                    确认删除
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+
+</body>
+
+<script th:inline="javascript">
+    // 定义bootstrapTable元素
+    let $site = $("#site");
+    // 表格刷新事件
+    $("#search").on("click", function () {
+        $site.bootstrapTable('refreshOptions', {
+            pageNumber: 1
+        });
+    });
+
+    // 自定义日志类型
+    $("form").on("change", "[name='format']", function () {
+        let $this = $(this);
+        let personalized = $($this.context.form).find(".formatPersonalized");
+        let input = $($this.context.form).find("[name='formatPersonalized']");
+        let val = $this.val();
+        switch (val) {
+            case "IIS":
+                personalized.show();
+                break;
+            case "APACHE":
+                personalized.hide();
+                input.val("4");
+                break;
+            case "TOMCAT":
+                personalized.hide();
+                input.val("4");
+                break;
+            case "FTP":
+                personalized.hide();
+                input.val("*");
+                break;
+
+        }
+    });
+
+    // 表单验证
+    let commonValidateOption = {
+        rules: {
+            cnName: {
+                isNoBlank: true,
+                uniqueSiteCnName: true
+            },
+            enName: {
+                isNoBlank: true,
+                remote: {
+                    url: "/manage/site/validateEnName",
+                    type: "POST",
+                    dataType: "JSON",
+                    data: {
+                        id: function () {
+                            let css = $("#addSite").css("display");
+                            if ("none" === css) {
+                                return $("#editSite [name='id']").val();
+                            } else {
+                                return -1;
+                            }
+                        },
+                        enName: function () {
+                            let css = $("#addSite").css("display");
+                            if ("none" === css) {
+                                return $("#editSite [name='enName']").val();
+                            } else {
+                                return $("#addSite [name='enName']").val();
+                            }
+                        }
+                    }
+                }
+            },
+            gid: "required",
+            subject: "required",
+            uri: {
+                isNoBlank: true,
+                uniqueSiteUri: true
+            },
+            format: "required",
+            formatPersonalized: {
+                isNoBlank: true
+            },
+            logfiles: {
+                isNoBlank: true
+            },
+            mName: {
+                isNoBlank: true
+            },
+            mUri: {
+                isNoBlank: true
+            }
+        },
+        messages: {
+            cnName: {
+                isNoBlank: "请输入站点中文名称",
+                uniqueSiteCnName: "名称已存在"
+            },
+            enName: {
+                isNoBlank: "请输入站点英文名称",
+                remote: "站点英文名称已存在"
+            },
+            gid: "请选择站点所属" + [[#{organization.name}]],
+            subject: "请选择站点所属领域",
+            uri: {
+                isNoBlank: "请输入站点标识",
+                uniqueSiteUri: "URI已存在"
+            },
+            format: "请选择日志格式",
+            formatPersonalized: {
+                isNoBlank: "请补全自定义日志格式"
+            },
+            logfiles: {
+                isNoBlank: "请输入原始日志文件目录"
+            },
+            mName: {
+                isNoBlank: "请输入监控站点名称"
+            },
+            mUri: {
+                isNoBlank: "请输入监控地址"
+            }
+        }
+    };
+    let validateAdd = $("#addSite form").validate(commonValidateOption);
+    let validateEdit = $("#editSite form").validate(commonValidateOption);
+
+    // 表单提交
+    $("#addSite .submit").on("click", function () {
+        if (validateAdd.form()) {
+            $.ajax({
+                url: "/manage/site/save",
+                type: "POST",
+                dataType: "JSON",
+                data: $(validateAdd.currentForm).serialize(),
+                success: function (result) {
+                    $('#addSite').trigger("click");
+                    $("#search").trigger("click")
+                }
+            })
+        }
+    });
+    $("#editSite .submit").on("click", function () {
+        if (validateEdit.form()) {
+            $.ajax({
+                url: "/manage/site/update",
+                type: "POST",
+                dataType: "JSON",
+                data: $(validateEdit.currentForm).serialize(),
+                success: function (result) {
+                    $('#editSite').trigger("click");
+                    $("#search").trigger("click")
+                }
+            })
+        }
+    });
+    $("#deleteSite .submit").on("click", function () {
+        $.ajax({
+            url: "/manage/site/delete",
+            type: "POST",
+            data: {"id": $("#delete-id").val()},
+            success: function (result) {
+                $('#deleteSite').trigger("click");
+                $("#search").trigger("click")
+            }
+        })
+    });
+
+    // 初始化页面
+    $(function () {
+        $site.bootstrapTable({
+            method: "POST",
+            url: "/manage/site/pageList",
+            contentType: "application/x-www-form-urlencoded",
+            pagination: true,
+            pageNumber: 1,
+            pageSize: 20,
+            queryParams: function (params) {
+                params["cnName"] = $.trim($("#searchName").val());
+                return params;
+            },
+            columns: [
+                {
+                    title: "序号",
+                    align: "center",
+                    class: "col-md-1",
+                    formatter: function (value, row, index) {
+                        return index + 1;
+                    }
+                }, {
+                    field: "cnName",
+                    title: "站点名称",
+                    class: "col-md-4",
+                    align: "center",
+                    valign: "middle"
+                }, {
+                    field: "instituteName",
+                    title: "所属" + [[#{organization.name}]],
+                    class: "col-md-3",
+                    align: "center",
+                    valign: "middle"
+                }, {
+                    field: "enName",
+                    title: "站点英文名称",
+                    class: "col-md-2",
+                    align: "center"
+                }, {
+                    field: "gid",
+                    visible: false
+                }, {
+                    field: "unitId",
+                    visible: false
+                }, {
+                    field: "mid",
+                    visible: false
+                }, {
+                    field: "statsNote",
+                    visible: false
+                }, {
+                    field: "mName",
+                    visible: false
+                }, {
+                    filed: "mUri",
+                    visible: false
+                }, {
+                    field: "mDescription",
+                    visible: false
+                }, {
+                    field: "check",
+                    title: "查看",
+                    class: "col-md-1",
+                    align: "center",
+                    valign: "middle",
+                    events: {
+                        "click .status": function (e, value, row, index) {
+                            window.open("../#integrator/dataStat/siteAnalyse/site?from=back&groupID=" + row.gid + "&siteId=" + row.id + "&unitId=" + row.unitId);
+                        },
+                        "click .statistic": function (e, value, row, index) {
+                            window.open("../#integrator/dataStat/synthesize?from=back&groupID=" + row.gid + "&siteId=" + row.id + "&unitId=" + row.unitId);
+                        },
+                    },
+                    formatter: function (value, row, index) {
+                        let array = [];
+                        array = array.concat([
+                            "<a class='status' href='javascript:void(0)' title='监控历史状态'>",
+                            "<i class='fa fa-history' data-toggle='modal' data-target='#status'> &nbsp;</i>",
+                            "</a>"
+                        ]);
+                        array = array.concat([
+                            "<a class='statistic' href='javascript:void(0)' title='查看统计信息'>",
+                            "<i class='fa fa-database' data-toggle='modal' data-target='#statistic'> &nbsp;</i>",
+                            "</a>"
+                        ]);
+                        return array.join("");
+                    }
+                }, {
+                    field: "operate",
+                    title: "操作",
+                    class: "col-md-1",
+                    align: "center",
+                    valign: "middle",
+                    events: {
+                        "click .edit": function (e, value, row, index) {
+                            if (row.formatPersonalized) {
+                                $("#editSite form .formatPersonalized").show();
+                            } else {
+                                $("#editSite form .formatPersonalized").hide();
+                            }
+                            $("#editSite form").fillForm(row);
+                        },
+                        "click .remove": function (e, value, row, index) {
+                            $("#delete-id").val(row.id);
+                        }
+                    },
+                    formatter: function (value, row, index) {
+                        let array = [];
+
+                        array = array.concat([
+                            "<a class='edit' href='javascript:void(0)' title='编辑'>",
+                            "<i class='fa fa-edit' data-toggle='modal' data-target='#editSite'> &nbsp;</i>",
+                            "</a>  "
+                        ]);
+                        let deleteHTML = $("#deleteHTML").html();
+                        array = array.concat([deleteHTML]);
+                        return array.join("");
+                    }
+                }
+            ]
+        });
+
+        // 院所列表
+        (function () {
+            let _this = this;
+            $.ajax({
+                url: "/manage/site/allInstitute",
+                type: "POST",
+                dataType: "JSON",
+                data: {"cnName": ""},
+                success: function (result) {
+                    let options = "<option value=''>选择" + [[#{organization.name}]] + "</option>";
+                    $.each(result, function (index, value) {
+                        options += "<option value='" + value.gid + "' username='" + value.username + "'>" + value.cnName + "</option>";
+                    });
+                    $("[name='gid']").empty();
+                    $("[name='gid']").append(options);
+                }
+
+            })
+        })();
+
+        // 领域列表
+        (function () {
+            $.ajax({
+                url: "/manage/site/allSubject",
+                type: "POST",
+                dataType: "JSON",
+                success: function (result) {
+                    let options = "<option value=''>选择领域</option>";
+                    $.each(result, function (index, value) {
+                        options += "<option value='" + value.id + "'>" + value.name + "</option>";
+                    });
+                    $("[name='subject']").empty();
+                    $("[name='subject']").append(options);
+                }
+            })
+        })();
+    })
+
+    // 切换弹窗清除校验、数据等信息
+    $("#addSite,#editSite").on("hide.bs.modal", function () {
+        validateAdd.resetForm();
+        validateEdit.resetForm();
+    });
+</script>
+</html>

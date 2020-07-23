@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <title>数据服务监控与统计系统</title>
+</head>
+<body>
+<section class="container territoryVisit">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">领域统计 - 下载量排名</div>
+                <ul class="nav nav-pills nav-justified ar-nav-pills center-block margin-bottom">
+                    <li class="jump"><a class="href" href="#integrator/territory/visit" id="visit">访问量排名</a></li>
+                    <li class="jump active"><a id="downloads">下载量排名</a></li>
+                </ul>
+                <div class="panel-body" id="quarter">
+                    <div class="form-group">
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="year">
+                            本年
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="quarter-1">
+                            一季度
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="quarter-2">
+                            二季度
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="quarter-3">
+                            三季度
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="quarter-4">
+                            四季度
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="halfYear-1">
+                            上半年
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="halfYear-2">
+                            下半年
+                        </label>
+                    </div>
+                    <div class="" id="chooseMonth">
+                        自定义起始年月
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <div class="input-group date">
+                                        <input class="form-control" id="datetimepicker10" type="text"/>
+                                        <span class="input-group-addon"><span
+                                                class="glyphicon glyphicon-calendar"></span>
+                </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <div class="input-group date">
+                                        <input class="form-control" id="datetimepicker11" type="text"/>
+                                        <span class="input-group-addon"><span
+                                                class="glyphicon glyphicon-calendar"></span>
+                </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-ar btn-primary" id="chooseYearMonth" onclick="selectTimeTest();"
+                                    type="submit">查询
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-primary">
+                <div class="panel-heading">领域统计</div>
+                <div class="panel-body" id="dataPie">
+                    饼状图
+                    <script th:inline="javascript" type="text/javascript">
+                        $(document).ready(function () {
+
+                        });
+                    </script>
+                </div>
+                <div class="panel-body">
+                    <table id="dataTable">
+                    </table>
+
+                    <script type="text/javascript">
+                        // 初始化时间插件
+                        var $datetimepickerBegin = $('#datetimepicker10');
+                        var beginDate = new Date();
+                        $datetimepickerBegin.datepicker({
+                            minViewMode: 1, // 最小显示为月份
+                            autoclose: true, // 自动关闭
+                            format: 'yyyy/mm',
+                            language: 'zh-CN'
+                        }).on("changeDate", function (date) {
+                            beginDate = date.date;
+                            initDatetimepickerEnd();
+                        });
+
+
+                        var $datetimepickerEnd = $('#datetimepicker11');
+
+                        function initDatetimepickerEnd() {
+                            $datetimepickerEnd.datepicker("destroy");
+                            $datetimepickerEnd.datepicker({
+                                minViewMode: 1,
+                                autoclose: true,
+                                format: 'yyyy/mm',
+                                language: 'zh-CN',
+                                startDate: beginDate,
+                                beforeShowMonth: function (date) {
+                                    var time = $datetimepickerBegin.val().split("\/");
+                                    if (date < new Date(time[0], time[1] - 1, 1)) {
+                                        return false;
+                                    }
+                                }
+                            });
+                        }
+
+                        initDatetimepickerEnd();
+
+                        var $datetimepickerMonth = $('#datetimepicker101');
+                        $datetimepickerMonth.datepicker({
+                            minViewMode: 1,
+                            autoclose: true,
+                            format: 'yyyy/mm',
+                            language: 'zh-CN'
+                        });
+                        /**
+                         * 季度选择 准备ajax数据
+                         */
+                        $("#quarter input[name='quarter']").on("change", function () {
+                            var _this = this;
+                            var symbol = _this.value;
+                            var timeConvert = msisAPP.radioTimeConvert(symbol);
+                            var startDate = timeConvert.begin;
+                            var endDate = timeConvert.end;
+                            selectData(startDate, endDate);
+                        });
+
+                        /**
+                         * 点击查询按钮时数据准备 及查询月份显示
+                         */
+                        function selectTimeTest() {
+                            if ($datetimepickerBegin.val().length === 0 || $datetimepickerEnd.val().length === 0) {
+                                $.myNotify.warning("请选择完整时间！");
+                                return;
+                            }
+                            var begin = msisAPP.selectTimeConvert($datetimepickerBegin.val());
+                            var end = msisAPP.selectTimeConvert($datetimepickerEnd.val());
+                            var startDate = begin.begin;
+                            var endDate = end.end;
+                            selectData(startDate, endDate);
+                        };
+
+                        /**
+                         * 根据选择月份查询数据
+                         */
+                        function selectData(startDate, endDate) {
+                            $.ajax({
+                                type: "POST",
+                                url: "../integrator/territory/downloadData",
+                                data: {"startDate": startDate, "endDate": endDate},
+                                dataType: "json",
+                                success: function (data) {
+                                    $('#dataTable').bootstrapTable('destroy');
+                                    var dynamicHeader = [];
+                                    dynamicHeader.push({
+                                        //field: 'Number',//可不加
+                                        title: '排名',//标题  可不加
+                                        align: 'center',
+                                        formatter: function (value, row, index) {
+                                            return index + 1;
+                                        }
+                                    }, {
+                                        field: 'name',
+                                        title: '学科领域名称',
+                                        width: 200,
+                                        align: 'center',
+                                        valign: 'middle',
+                                    }, {
+                                        field: 'sumPages',
+                                        title: '访问人次',
+                                        align: 'center',
+                                        valign: 'middle',
+                                        class: 'number-thousands'
+                                    }, {
+                                        field: 'sumHits',
+                                        title: '网页访问数',
+                                        align: 'center',
+                                        valign: 'middle',
+                                        class: 'number-thousands'
+                                    }, {
+                                        field: 'sumBandwidth',
+                                        title: '下载量(MB)',
+                                        align: 'center',
+                                        class: 'number-thousands',
+                                        valign: 'middle', formatter: function (value, row, index) {
+                                            var valu = (value / 1024 / 1024).toFixed(2) + "MB";
+                                            return valu;
+                                        }
+                                    });
+                                    $('#dataTable').bootstrapTable({
+                                        data: data,
+                                        columns: dynamicHeader
+                                    });
+                                    $('#dataTable').bootstrapTable('hideLoading');
+                                    var pieData = new Array();
+                                    for (var i = 0; i < data.length; i++) {
+                                        pieData.push({name: data[i].name, y: data[i].sumBandwidth / 1024 / 1024});
+                                    }
+                                    $('#dataPie').highcharts().redraw();
+                                    $('#dataPie').highcharts().series[0].setData(pieData);
+                                    msisAPP.numberFormat();
+                                },
+                                error: function () {
+                                    //请求出错处理
+                                }
+                            });
+                        }
+                    </script>
+                    <script th:inline="javascript" type="text/javascript">
+                        $(document).ready(function () {
+                            //1、设置查询时间默认选中项
+                            $("input[name='quarter'][value='year']").attr("checked", true);
+
+                            //饼状图展示
+                            var resultList = [[${resultList}]];
+                            var data = new Array();
+                            for (var i = 0; i < resultList.length; i++) {
+                                data.push({name: resultList[i].name, y: resultList[i].sumBandwidth / 1024 / 1024});
+                            }
+                            var chart = {
+                                plotBackgroundColor: null,
+                                plotBorderWidth: null,
+                                plotShadow: false
+                            };
+                            var title = {
+                                text: ''
+                            };
+                            var tooltip = {
+                                pointFormat: '<b>下载量：</b>{point.y:.2f}MB<br/><b>比率：</b>{point.percentage:.2f}%'
+                            };
+                            var plotOptions = {
+                                pie: {
+                                    allowPointSelect: true,
+                                    cursor: 'pointer',
+                                    dataLabels: {
+                                        enabled: true,
+                                        format: '{point.name}{point.percentage:.2f} %',
+                                        style: {
+                                            color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
+                                        }
+                                    }
+                                }
+                            };
+                            var legend = {
+                                enabled: true,
+                                layout: "vertical",
+                                align: "left",
+                                x: 100,
+                                y: 50,
+                                verticalAlign: "center",
+                                labelFormatter: function () {
+                                    return this.name + "(" + this.percentage.toFixed(2) + "%)";
+                                }
+                            }
+                            var series = [{
+                                type: 'pie',
+                                data: data,
+                                showInLegend: true
+                            }];
+                            var credits = [
+                                {
+                                    enabled: false
+                                }
+                            ];
+
+                            var json = {};
+                            json.chart = chart;
+                            json.title = title;
+                            json.tooltip = tooltip;
+                            json.series = series;
+                            json.legend = legend;
+                            json.plotOptions = plotOptions;
+                            json.credits = credits;
+                            $('#dataPie').highcharts(json);
+
+                            /**
+                             * 图表展示
+                             */
+                            var resultList = [[${resultList}]];
+                            var dynamicHeader = [];
+                            dynamicHeader.push({
+                                title: '排名',//标题  可不加
+                                align: 'center',
+                                formatter: function (value, row, index) {
+                                    return index + 1;
+                                }
+                            }, {
+                                field: 'name',
+                                title: '学科领域名称',
+                                width: 200,
+                                align: 'center',
+                                valign: 'middle',
+                            }, {
+                                field: 'sumPages',
+                                title: '访问人次',
+                                align: 'center',
+                                valign: 'middle',
+                                class: 'number-thousands'
+                            }, {
+                                field: 'sumHits',
+                                title: '网页访问数',
+                                align: 'center',
+                                valign: 'middle',
+                                class: 'number-thousands'
+                            }, {
+                                field: 'sumBandwidth',
+                                title: '下载量(MB)',
+                                align: 'center',
+                                valign: 'middle',
+                                class: 'number-thousands',
+                                formatter: function (value, row, index) {
+                                    var valu = (value / 1024 / 1024).toFixed(2) + "MB";
+                                    return valu;
+                                }
+                            });
+                            $('#dataTable').bootstrapTable({
+                                data: resultList,
+                                columns: dynamicHeader
+                            });
+                            $('#dataTable').bootstrapTable('hideLoading');
+                        });
+                        msisAPP.numberFormat();
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+</body>
+</html>

@@ -1,0 +1,123 @@
+.asterisk {
+    font-style: normal;
+    color: red;
+}
+
+.admin-hide {
+    display: none;
+}
+
+.records {
+    color: red;
+    font-weight: bold;
+}
+
+[data-notify="container"] {
+    width: auto;
+}
+
+[data-notify="message"] {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.height-20 {
+    height: 20px;
+}
+
+.main-header .top-nav {
+    right: 1.7%;
+    padding-top: 6px;
+}
+
+.main-header .top-nav .dropdown-toggle {
+    border-radius: 5px;
+    margin-top: -10px;
+}
+
+/*左侧导航栏*/
+div#wer .blod {
+    font-weight: bold;
+}
+
+div#wer .sidebar-nav > li > a:after {
+    content: none;
+}
+
+div#wer .gray {
+    background-color: darkgray;
+}
+
+div#wer .menu-submenu li a {
+    border-left-color: #333;
+}
+
+div#wer .borderc {
+    border-left-color: #333;
+}
+
+div#wer ul li {
+    line-height: 40px;
+}
+
+
+div#wer .sidebar-nav li a.collapsed {
+    border: none;
+}
+
+/*zTree右键菜单样式*/
+div#rMenu {
+    position: absolute;
+    visibility: hidden;
+    top: 0;
+    background-color: #dfdfdf;
+    text-align: left;
+    padding: 0px;
+}
+
+div#rMenu ul li {
+    border-bottom: 1px solid white;
+    margin: 0px 0;
+    padding: 10px 20px;
+    cursor: pointer;
+    list-style: none outside none;
+    background-color: #DFDFDF;
+}
+
+div#rMenu ul li:hover {
+    background-color: #0099da;
+}
+
+/*按钮切换隐藏属性*/
+.changeButton {
+    display: none;
+}
+
+.changeButton.default {
+    display: inline;
+}
+
+/*后台管理弹窗样式居中*/
+.modal-body div.col-md-3 {
+    margin-left: 15%;
+}
+
+.modal-body div.slice {
+    background-color: #6666;
+}
+
+.modal-body textarea {
+    height: 32px;
+}
+
+.table .thead-dark th {
+    color: #fff;
+    background-color: #0099da;
+    border-color: #0099da
+}
+
+.star:after {
+    content: "*";
+    color: red;
+    font-weight: bolder;
+}

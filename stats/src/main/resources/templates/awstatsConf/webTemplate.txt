@@ -1,0 +1,4 @@
+Include "awstats.common.conf"
+LogFile="[(${awstatsRootPath})]/tools/logresolvemerge.pl [(${logfile})] |"
+LogFormat=[(${logFormat})]
+SiteDomain="[(${siteUri})]"

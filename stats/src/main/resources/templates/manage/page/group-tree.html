@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>菜单树管理</title>
+</head>
+<body>
+<div id="rMenu" style=" z-index:1000000000">
+    <ul style="padding-left: 0px;margin-bottom: 0px">
+        <li id="m_edit">编辑站点群</li>
+        <li id="m_del">删除站点群</li>
+    </ul>
+</div>
+<!-- 删除站点群信息-->
+<div aria-hidden="true" aria-labelledby="deleteModalLabel" class="modal fade" id="deleteGroup" role="dialog"
+     tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button aria-hidden="true" class="close" data-dismiss="modal" type="button">
+                    &times;
+                </button>
+                <h4 class="modal-title" id="deleteModalLabel">
+                    删除站点群信息
+                </h4>
+            </div>
+            <div class="modal-body">
+                <strong>站点群信息很重要，确认要删除么？</strong>
+                <input id="delete-id" type="hidden">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-default" data-dismiss="modal" type="button">取消
+                </button>
+                <button class="btn btn-primary submit" type="button">
+                    确认删除
+                </button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal -->
+</div>
+<div class="panel panel-primary">
+    <div class="panel-heading">站点群管理 - 菜单树管理
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-4">
+                <ul class="ztree" id="zTreeTree"></ul>
+            </div>
+            <div class="col-md-8">
+                <form id="groupForm">
+                    <input name="pid" type="hidden"/>
+                    <input name="id" type="hidden"/>
+                    <div class="form-group">
+                        <!--站点群名称-->
+                        <div class="row">
+                            <div class="col-md-2 star">
+                                站点群名称
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" name="cnName" type="text">
+                            </div>
+                        </div>
+                        <div class="height-20"></div>
+                        <!--所属院所-->
+                        <div class="row">
+                            <div class="col-md-2 star">
+                                所属[[#{organization.name}]]
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-control" name="iid"></select>
+                            </div>
+                        </div>
+                        <div class="height-20"></div>
+                        <!--站点群简称-->
+                        <div class="row">
+                            <div class="col-md-2 star">
+                                站点群简称
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" name="shortName" type="text">
+                            </div>
+                        </div>
+                        <div class="height-20"></div>
+                        <!--是否显示排名-->
+                        <div class="row">
+                            <div class="col-md-2">
+                                是否显示
+                            </div>
+                            <div class="col-md-4">
+                                <label class="checkbox-inline">
+                                    <input checked="checked" name="isShow" type="radio" value="1">
+                                    显示
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input name="isShow" type="radio" value="0">
+                                    不显示
+                                </label>
+                                <!--suppress XmlInvalidId -->
+                                <label class="error" for="gtype"></label>
+                            </div>
+                        </div>
+                        <div class="height-20"></div>
+                        <!--排名位置-->
+                        <div class="row">
+                            <div class="col-md-2 star">
+                                站点群排序
+                            </div>
+                            <div class="col-md-4">
+                                <input class="form-control" name="orderNum" placeholder="排序字段，可使用小数" type="text"/>
+                            </div>
+                        </div>
+                        <div class="height-20"></div>
+                        <!--备注说明-->
+                        <div class="row">
+                            <div class="col-md-2">
+                                备注说明
+                            </div>
+                            <div class="col-md-4">
+                                <textarea class="form-control" name="description"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="changeButton default" id="addGroup" type="button">新增</button>
+                    <button class="changeButton" id="editGroup" type="button">确认修改</button>
+                    <button id="resetForm" type="button">重置</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<script th:inline="javascript" type="text/javascript">
+
+
+    let initzTree = function () {
+        $.ajax({
+            url: "/manage/group/groupTree",
+            type: "POST",
+            dataType: "JSON",
+            success: function (result) {
+                // 初始化树
+                treeObj = $.fn.zTree.init($("#zTreeTree"), zTreeSetting, result);
+                // 触发根节点选中事件
+                $("#" + treeObj.getNodes()[0].tId + "_a").trigger("click");
+                rMenu = $("#rMenu");
+            }
+        });
+    };
+
+    // 右键菜单
+    let rMenu;
+    // 编辑表单
+    let $form = $("#groupForm");
+    // 树相关参数
+    let treeObj, timer, sleep = 200;
+    // 树设置信息
+    let zTreeSetting = {
+        data: {
+            key: {
+                name: "cnName"
+            }
+        },
+        // 回调函数
+        callback: {
+            // 站点群右键展示菜单栏
+            onRightClick: function (event, treeId, treeNode) {
+                treeObj.selectNode(treeNode);
+                let fromData = {};
+                if (treeNode.level > 0) {
+                    showRMenu(treeNode.level, event.clientX - $("#content-wrapper").position().left, event.clientY - $("#content-wrapper").position().top);
+                    validateAddGroup.resetForm();
+                    validateEditGroup.resetForm();
+                }
+            },
+            // 节点捕获单击之前
+            beforeClick: function (treeId, treeNode, clickFlag) {
+                if (timer) {
+                    clearTimeout(timer);
+                }
+                timer = setTimeout(function () {
+                    if (clickFlag === undefined || treeNode.level !== 0) {
+                        return false;
+                    }
+                    treeObj.selectNode(treeNode);
+                    treeObj.setting.callback.onClick(null, treeId, treeNode, clickFlag)
+                }, sleep);
+                return false;
+            },
+            // 节点捕获单击回调
+            onClick: function (event, treeId, treeNode, clickFlag) {
+                $("#groupForm [name='pid']").val(treeNode.id);
+                $("#groupForm [name='id']").val("");
+                changeButton("addGroup");
+                $form.clearForm();
+            },
+            // 节点捕获双击之前
+            beforeDblClick: function (treeId, treeNode, clickFlag) {
+                if (timer) {
+                    clearTimeout(timer);
+                }
+                return true;
+            },
+            // 节点捕获双击事件
+            onDblClick: function (event, treeId, treeNode, clickFlag) {
+            }
+        }
+    };
+
+    function showRMenu(level, x, y) {
+        $("#rMenu ul").show();
+        if (level !== 0) {
+            $("#m_del").show();
+            $("#m_edit").show();
+        }
+
+        y += document.body.scrollTop;
+        x += document.body.scrollLeft;
+        rMenu.css({"top": y + "px", "left": x + "px", "visibility": "visible"});
+
+        $("body").bind("mousedown", onBodyMouseDown);
+    }
+
+    function hideRMenu() {
+        if (rMenu) rMenu.css({"visibility": "hidden"});
+        $("body").unbind("mousedown", onBodyMouseDown);
+    }
+
+    function onBodyMouseDown(event) {
+        if (!(event.target.id == "rMenu" || $(event.target).parents("#rMenu").length > 0)) {
+            rMenu.css({"visibility": "hidden"});
+        }
+    }
+
+    // 右键菜单栏事件
+    // 编辑组信息
+    $("#m_edit").on("click", function () {
+        changeButton("editGroup");
+        let treeNode = treeObj.getSelectedNodes()[0];
+        let dataForm = {};
+        dataForm["id"] = treeNode.id;
+        dataForm["cnName"] = treeNode.cnName;
+        dataForm["shortName"] = treeNode.shortName;
+        dataForm["iid"] = treeNode.iid;
+        dataForm["isShow"] = treeNode.isShow;
+        dataForm["orderNum"] = treeNode.orderNum;
+        dataForm["description"] = treeNode.description;
+        formDataTemp = dataForm;
+        $form.fillForm(dataForm);
+        hideRMenu();
+    });
+    // 删除组信息
+    $("#m_del").on("click", function () {
+        $('#deleteGroup').modal("show");
+
+    });
+
+    $("#deleteGroup .submit").on("click", function () {
+        $.ajax({
+            url: "/manage/group/deleteGroup",
+            type: "POST",
+            dataType: "JSON",
+            data: {"id": treeObj.getSelectedNodes()[0].id},
+            success: function (result) {
+                $('#deleteGroup').modal("hide");
+                if (result.id !== undefined || result.id !== "") {
+                    initzTree();
+                    $.myNotify.success(result.cnName + "站点群:删除成功！");
+                } else {
+                    $.myNotify.error(result.cnName + "站点群:删除失败！");
+                }
+            }
+        });
+        hideRMenu();
+    });
+
+    // 按钮事件
+    // 新增组
+    $("#addGroup").on("click", function () {
+        if (validateAddGroup.form()) {
+            $.ajax({
+                url: "/manage/group/addGroup",
+                type: "POST",
+                dataType: "JSON",
+                data: $(validateAddGroup.currentForm).serialize(),
+                success: function (result) {
+                    if (result.id !== undefined || result.id !== "") {
+                        initzTree();
+                        $("#resetForm").trigger("click");
+                        $.myNotify.success(result.cnName + "站点群:添加成功！");
+                    } else {
+                        $.myNotify.error(result.cnName + "站点群:添加失败！");
+                    }
+                }
+            })
+        }
+
+    });
+    // 编辑组
+    $("#editGroup").on("click", function () {
+        if (validateEditGroup.form()) {
+            $.ajax({
+                url: "/manage/group/editGroup",
+                type: "POST",
+                dataType: "JSON",
+                data: $(validateEditGroup.currentForm).serialize(),
+                success: function (result) {
+                    if (result.id !== undefined || result.id !== "") {
+                        initzTree();
+                        $form.clearForm();
+                        $.myNotify.success(result.cnName + "站点群:编辑成功！");
+                    } else {
+                        $.myNotify.error(result.cnName + "站点群:编辑失败！");
+                    }
+                }
+            })
+        }
+    });
+
+    function validateCnName() {
+        let flag = false;
+        $.ajax({
+            url: "/manage/group/validateCnName",
+            type: "POST",
+            dataType: "JSON",
+            async: false,
+            data: {
+                pid: $('#groupForm [name="pid"]').val(),
+                id: $('#groupForm [name="id"]').val(),
+                cnName: $('#groupForm [name="cnName"]').val()
+            },
+            success: function (result) {
+                flag = result;
+            }
+        });
+    }
+
+    //重置表单
+    let formDataTemp;
+    $("#resetForm").on("click", function () {
+        if ($("[name=\"id\"]").val() === "") {
+            $("[name=\"cnName\"]").val("");
+            $("[name=\"shortName\"]").val("");
+            $("[name=\"description\"]").val("");
+            $("[name=\"orderNum\"]").val("");
+            $("[name=\"iid\"]").val("");
+        } else {
+            $form.fillForm(formDataTemp);
+        }
+    });
+    // 验证表单
+    let validateAddGroup = $form.validate({
+        ignore: ["hidden"],
+        rules: {
+            iid: "required",
+            cnName: {
+                isNoBlank: true,
+                remote: {
+                    url: "/manage/group/validateCnName",
+                    type: "POST",
+                    dataType: "JSON",
+                    data: {
+                        pid: function () {
+                            return $('#groupForm [name="pid"]').val()
+                        },
+                        id: function () {
+                            return $('#groupForm [name="id"]').val()
+                        },
+                        cnName: function () {
+                            return $('#groupForm [name="cnName"]').val()
+                        }
+                    }
+                }
+            },
+            shortName: {
+                isNoBlank: true
+            },
+            orderNum: {
+                isNoBlank: true,
+                isPositive: true
+            }
+        },
+        messages: {
+            iid: "请选择所属" + [[#{organization.name}]],
+            cnName: {
+                isNoBlank: "请输入站点群名称",
+                remote: "该站点群名称已存在"
+            },
+            shortName: {
+                isNoBlank: "请输入站点群简称"
+            },
+            orderNum: {
+                isNoBlank: "请输入排序值",
+                isPositive: "请输入一个正数"
+            }
+        }
+    });
+    let validateEditGroup = $form.validate({
+        ignore: ["hidden"],
+        rules: {
+            id: "required",
+            iid: "required",
+            cnName: {
+                isNoBlank: true,
+                cnName: {
+                    isNoBlank: true,
+                    remote: {
+                        url: "/manage/group/validateCnName",
+                        type: "POST",
+                        dataType: "JSON",
+                        data: {
+                            pid: function () {
+                                return $('#groupForm [name="pid"]').val()
+                            },
+                            id: function () {
+                                return $('#groupForm [name="id"]').val()
+                            },
+                            cnName: function () {
+                                return $('#groupForm [name="cnName"]').val()
+                            }
+                        }
+                    }
+                },
+            },
+            shortName: {
+                isNoBlank: true
+            },
+            gtype: "required"
+        },
+        messages: {
+            id: "请选择站点群",
+            iid: "请选择所属" + [[#{organization.name}]],
+            cnName: {
+                isNoBlank: "请输入站点群名称"
+            },
+            shortName: {
+                isNoBlank: "请输入站点群简称"
+            },
+            gtype: "请选择站点群类型"
+        }
+    });
+
+    function changeButton(id) {
+        $(".changeButton").hide();
+        if (id === "addGroup") {
+            $("button.changeButton[id='addGroup']").show();
+        } else {
+            $("button.changeButton[id='editGroup']").show();
+        }
+    }
+
+    function initInstitutes() {
+        $.ajax({
+            url: "/manage/site/allInstitute",
+            type: "POST",
+            dataType: "JSON",
+            data: {"cnName": ""},
+            success: function (result) {
+                let options = "<option value=''>选择" + [[#{organization.name}]] + "</option>";
+                $.each(result, function (index, value) {
+                    options += "<option value='" + value.gid + "'>" + value.cnName + "</option>";
+                });
+                $("[name='iid']").empty();
+                $("[name='iid']").append(options);
+            }
+
+        })
+    }
+    $(function () {
+        // 初始化树
+        initzTree();
+
+        // 初始化院所下拉菜单
+        initInstitutes();
+    })
+</script>
+</html>

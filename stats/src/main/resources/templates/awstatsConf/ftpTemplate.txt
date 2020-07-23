@@ -1,0 +1,7 @@
+Include "awstats.common_ftp.conf"
+LogFile="[(${awstatsRootPath})]/tools/logresolvemerge.pl [(${logfile})] |"
+/*[-*/
+LogFormat=[(${logFormat})]
+/*-]*/
+LogFormat="%time3 %other %host %bytesd %url %other %other %method %other %logname %other %code %other %other"
+SiteDomain="[(${siteUri})]"

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <style>
+        .formatPersonalized {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+<div class="panel panel-primary">
+    <div class="panel-heading">站点群管理 - [[#{organization.name}]]站点群
+    </div>
+    <div class="panel-body">
+        <div class="form-inline">
+            <input class="form-control" id="searchName" placeholder="输入站点群名称" type="text"/>
+            <button class="btn btn-primary" id="search">查询</button>
+        </div>
+        <div class="height-20"></div>
+        <table id="group">
+        </table>
+    </div>
+</div>
+</body>
+
+<script th:inline="javascript">
+    // 定义bootstrapTable元素
+    let $group = $("#group");
+    // 表格刷新事件
+    $("#search").on("click", function () {
+        $group.bootstrapTable('refreshOptions', {
+            pageNumber: 1
+        });
+    });
+
+
+    // 初始化页面
+    $(function () {
+        $group.bootstrapTable({
+            method: "POST",
+            url: "/manage/group/pageList",
+            contentType: "application/x-www-form-urlencoded",
+            pagination: true,
+            pageNumber: 1,
+            pageSize: 20,
+            queryParams: function (params) {
+                params["cnName"] = $.trim($("#searchName").val());
+                return params;
+            },
+            columns: [
+                {
+                    title: "序号",
+                    align: "center",
+                    class: "col-md-1",
+                    formatter: function (value, row, index) {
+                        return index + 1;
+                    }
+                }, {
+                    field: "cnName",
+                    title: "站点群名称",
+                    class: "col-md-8",
+                    align: "center",
+                    valign: "middle"
+                }, {
+                    field: "isShow",
+                    title: "类型",
+                    class: "col-md-2",
+                    align: "center",
+                    valign: "middle",
+                    formatter: function (value, row, index) {
+                        if (row.isShow === 0) {
+                            return "非公开站点群";
+                        } else {
+                            return "公开站点群";
+                        }
+                    }
+                }, {
+                    field: "check",
+                    title: "查看",
+                    class: "col-md-1",
+                    align: "center",
+                    valign: "middle",
+                    events: {
+                        "click .statistic": function (e, value, row, index) {
+                            window.open("../#integrator/dataStat/synthesize?from=back&groupID=" + row.id + "&siteId=-1&unitId=-1");
+                        },
+                    },
+                    formatter: function (value, row, index) {
+                        let array = [];
+                        array = array.concat([
+                            "<a class='statistic' href='javascript:void(0)' title='查看统计信息'>",
+                            "<i class='fa fa-database' data-toggle='modal' data-target='#statistic'> &nbsp;</i>",
+                            "</a>"
+                        ]);
+                        return array.join("");
+                    }
+                }
+            ]
+        });
+
+    })
+</script>
+</html>

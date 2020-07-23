@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <title>数据服务监控与统计系统</title>
+</head>
+<body>
+<section class="container timeAnalyse">
+    <div class="row">
+        <div class="col-md-12">
+            当前节点:<strong class="" id="groupSelect"></strong>
+            <div class="height-20"></div>
+            <strong class="" id="groupIdSelect" style="float: right;display: none"
+                    th:text="${dataStatReport.getId()}"></strong>
+            <strong class="groupId" id="groupId" style="float: right"
+                    th:text="'?groupID='+${dataStatReport.getId()}"></strong>
+            <ul class="nav nav-pills nav-justified ar-nav-pills center-block margin-bottom">
+                <li><a class="href" href="#integrator/dataStat/synthesize">综合报告</a></li>
+                <li class="active"><a class="href" href=''>时段分析</a></li>
+                <li><a class="href" href="#integrator/dataStat/fromAnalyse">来源分析</a></li>
+                <li><a class="href" href="#integrator/dataStat/naturalAnalyse">资源分析</a></li>
+                <li><a class="href" href="#integrator/dataStat/siteAnalyse">站点状态监测</a></li>
+                <li><a class="href" href="#integrator/dataStat/rateAnalyse">服务正常率时段分析</a></li>
+            </ul>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    时段分析
+                </div>
+                <div class="panel-body" id="quarter">
+                    <div class="form-group">
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="year">
+                            本年
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="quarter-1">
+                            一季度
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="quarter-2">
+                            二季度
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="quarter-3">
+                            三季度
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="quarter-4">
+                            四季度
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="halfYear-1">
+                            上半年
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="halfYear-2">
+                            下半年
+                        </label>
+                    </div>
+                    <div class="" id="chooseMonth">
+                        自定义起始年月
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <div class="input-group date">
+                                        <input class="form-control" id="datetimepicker10" type="text"/>
+                                        <span class="input-group-addon"><span
+                                                class="glyphicon glyphicon-calendar"></span>
+                </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <div class="input-group date">
+                                        <input class="form-control" id="datetimepicker11" type="text"/>
+                                        <span class="input-group-addon"><span
+                                                class="glyphicon glyphicon-calendar"></span>
+                </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-ar btn-primary" id="chooseYearMonth" onclick="selectTimeTest();"
+                                    type="submit">查询
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    统计指标
+                </div>
+                <div class="panel-body">
+                    统计时段：
+                    <strong id="period" th:text="2019年"></strong>
+                    <table class="table">
+                        <tr>
+                            <td></td>
+                            <td>浏览器用户</td>
+                            <td>非浏览器用户</td>
+                        </tr>
+                        <tr>
+                            <td>累计独立IP</td>
+                            <td><strong class="number-thousands"
+                                        id="SumTotalUnique"
+                                        th:text="${dataStatReport.getSumTotalUnique()}"></strong></td>
+                            <td>- -</td>
+                        </tr>
+                        <tr>
+                            <td>累计访问人次</td>
+                            <td><strong class="number-thousands" id="SumTotalVisits"
+                                        th:text="${dataStatReport.getSumTotalVisits()}"></strong>
+                                <p class="" id="VisitsIP"
+                                   th:text="${(dataStatReport.getSumTotalUnique().doubleValue())==0}?'('+'- -访问人次/独立IP)':${'('+#numbers.formatDecimal((dataStatReport.getSumTotalVisits().doubleValue())/(dataStatReport.getSumTotalUnique().doubleValue()),0,2) +'访问人次/独立IP)'}"></p>
+                            </td>
+                            <td>- -</td>
+                        </tr>
+                        <tr>
+                            <td>累计页面访问数</td>
+                            <td>
+                                <strong class="number-thousands"
+                                        id="Pages" th:text="${dataStatReport.getPages()}"></strong>
+                                <p class="" id="PagesVisits"
+                                   th:text="${(dataStatReport.getSumTotalVisits().doubleValue())==0}?'('+'- -页面访问数/访问人次)':${'('+#numbers.formatDecimal(dataStatReport.getPages().doubleValue()/dataStatReport.getSumTotalVisits().doubleValue(),0,2) +'页面访问数/访问人次)'}"></p>
+                            </td>
+                            <td><strong class="number-thousands"
+                                        id="RobotPages" th:text="${dataStatReport.getRobotPages()}"></strong>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>累计文件数</td>
+                            <td><strong class="number-thousands"
+                                        id="Hits" th:text="${dataStatReport.getHits()}"></strong>
+                                <p class="" id="HitsVisits"
+                                   th:text="${(dataStatReport.getSumTotalVisits().doubleValue())==0}?'('+'- -文件数/访问人次)':'('+${#numbers.formatDecimal(dataStatReport.getHits().doubleValue()/dataStatReport.getSumTotalVisits().doubleValue(),0,2)+'文件数/访问人次)'}"></p>
+                            </td>
+                            <td><strong class="number-thousands"
+                                        id="RobotHits" th:text="${dataStatReport.getRobotHits()}"></strong></td>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>累计下载量</td>
+                            <td><strong class="number-GB"
+                                        id="Bandwidth" th:text="${dataStatReport.getBandwidth()}"></strong>
+                                <p class="number-thousands" id="BandwidthVisits"
+                                   th:text="${(dataStatReport.getSumTotalVisits().doubleValue())==0}?'('+'- -字节/访问人次)':'('+${#numbers.formatDecimal(dataStatReport.getBandwidth().doubleValue()/dataStatReport.getSumTotalVisits().doubleValue(),0,2)}+'字节/访问人次)'"></p>
+                            </td>
+                            <td><strong class="number-GB"
+                                        id="RobotBandwidth" th:text="${dataStatReport.getRobotBandwidth()}"></strong>
+                            </td>
+                        </tr>
+                    </table>
+                    <span style="color: red">* 非浏览的用户包括搜索引擎机器人，蠕虫病毒产生的流量和非正常的HTTP相应</span>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    按月历史统计
+                </div>
+                <div class="panel-body" id="dataByMonth">
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    按日期统计
+                </div>
+                <div class="panel-body">
+                    <div id="dataByDay"></div>
+                    <table id="dataTableDay"></table>
+                </div>
+
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    国家或地区 (前 10)
+                </div>
+                <div class="panel-body">
+                    <div id="countryChart"></div>
+                    <table id="countryTable"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script th:inline="javascript">
+    // 数据访问量折线图
+    var listIP = [[${dataStatReport.IPMonth}]] == null ? [] : [[${dataStatReport.IPMonth}]];
+    $.each(listIP, function (index) {
+        var time = listIP[index][0];
+        var year = Math.floor(time / 10000);
+        var month = Math.floor(time % 10000 / 100);
+        var date = Date.UTC(year, month - 1);
+        listIP[index][0] = date;
+    });
+    var listVisit = [[${dataStatReport.VisitMonth}]] == null ? [] : [[${dataStatReport.VisitMonth}]];
+    $.each(listVisit, function (index) {
+        var time1 = listVisit[index][0];
+        var year1 = Math.floor(time1 / 10000);
+        var month1 = Math.floor(time1 % 10000 / 100);
+        var date = Date.UTC(year1, month1 - 1);
+        listVisit[index][0] = date;
+    });
+    var listPageMonth = [[${dataStatReport.PageMonth}]] == null ? [] : [[${dataStatReport.PageMonth}]];
+    $.each(listPageMonth, function (index) {
+        var time = listPageMonth[index][0];
+        var year = Math.floor(time / 10000);
+        var month = Math.floor(time % 10000 / 100);
+        var date = Date.UTC(year, month - 1);
+        listPageMonth[index][0] = date;
+    });
+    var listHitsMonth = [[${dataStatReport.HitsMonth}]] == null ? [] : [[${dataStatReport.HitsMonth}]];
+    $.each(listHitsMonth, function (index) {
+        var time = listHitsMonth[index][0];
+        var year = Math.floor(time / 10000);
+        var month = Math.floor(time % 10000 / 100);
+        var date = Date.UTC(year, month - 1);
+        listHitsMonth[index][0] = date;
+    });
+    var listBandwidthMonth = [[${dataStatReport.BandwidthMonth}]] == null ? [] : [[${dataStatReport.BandwidthMonth}]];
+    $.each(listBandwidthMonth, function (index) {
+        var time = listBandwidthMonth[index][0];
+        var year = Math.floor(time / 10000);
+        var month = Math.floor(time % 10000 / 100);
+        var date = Date.UTC(year, month - 1);
+        listBandwidthMonth[index][0] = date;
+    });
+
+    Highcharts.chart('dataByMonth', {
+        chart: {
+            zoomType: 'x'
+        },
+        boost: {
+            useGPUTranslations: true
+        },
+        title: {
+            text: '每月统计'
+        },
+        xAxis: {
+            type: 'datetime',
+            title: {
+                text: '日期'
+            },
+            labels: {
+                step: 1,
+                formatter: function () {
+                    return Highcharts.dateFormat('%Y-%m', this.value);
+                }
+            }
+
+        },
+        yAxis: {
+            title: {
+                text: '访问量'
+            }
+        },
+        tooltip: {
+            valueDecimals: 0,
+            formatter: function () {
+                if ("月下载量" === this.series.name) {
+                    return '<b>' + Highcharts.dateFormat('%Y-%m', this.x) + '</b><br/>' + '月下载量:' + Highcharts.numberFormat((this.y) / 1024 / 1024, 0, '.', ',') + 'MB';
+                } else {
+                    return '<b>' + Highcharts.dateFormat('%Y-%m', this.x) + '</b><br/>' + this.series.name + Highcharts.numberFormat((this.y), 0, '.', ',');
+                }
+            }
+        },
+        series: [{
+            type: 'line',
+            name: '月独立IP',
+            data: listIP,
+            lineWidth: 0.8
+        }]
+    });
+    $('#dataByMonth').highcharts().addSeries({
+        name: '月访问人次',
+        data: listVisit
+    });
+    $('#dataByMonth').highcharts().addSeries({
+        name: '月网页访问数',
+        data: listPageMonth
+    });
+    $('#dataByMonth').highcharts().addSeries({
+        name: '月请求数',
+        data: listHitsMonth
+    });
+    $('#dataByMonth').highcharts().addSeries({
+        name: '月下载量',
+        data: listBandwidthMonth
+    });
+
+
+    // 每日量折线图
+    var listVisits = [[${dataStatReport.VisitDay}]] == null ? [] : [[${dataStatReport.VisitDay}]];
+    $.each(listVisits, function (index) {
+        var time = listVisits[index][0];
+        var year = Math.floor(time / 10000);
+        var month = Math.floor(time % 10000 / 100);
+        var day = time % 10000 % 100;
+        var date = Date.UTC(year, month - 1, day);
+        listVisits[index][0] = date;
+    });
+    var listPages = [[${dataStatReport.PageDay}]] == null ? [] : [[${dataStatReport.PageDay}]];
+    $.each(listPages, function (index) {
+        var time = listPages[index][0];
+        var year = Math.floor(time / 10000);
+        var month = Math.floor(time % 10000 / 100);
+        var day = time % 10000 % 100;
+        var date = Date.UTC(year, month - 1, day);
+        listPages[index][0] = date;
+    });
+    var listHits = [[${dataStatReport.HitsDay}]] == null ? [] : [[${dataStatReport.HitsDay}]];
+    $.each(listHits, function (index) {
+        var time = listHits[index][0];
+        var year = Math.floor(time / 10000);
+        var month = Math.floor(time % 10000 / 100);
+        var day = time % 10000 % 100;
+        var date = Date.UTC(year, month - 1, day);
+        listHits[index][0] = date;
+    });
+    var listBandwidth = [[${dataStatReport.BandwidthDay}]] == null ? [] : [[${dataStatReport.BandwidthDay}]];
+    $.each(listBandwidth, function (index) {
+        var time = listBandwidth[index][0];
+        var year = Math.floor(time / 10000);
+        var month = Math.floor(time % 10000 / 100);
+        var day = time % 10000 % 100;
+        var date = Date.UTC(year, month - 1, day);
+        listBandwidth[index][0] = date;
+    });
+
+    Highcharts.chart('dataByDay', {
+        chart: {
+            zoomType: 'x'
+        },
+        boost: {
+            useGPUTranslations: true
+        },
+        title: {
+            text: '每天统计'
+        },
+        xAxis: {
+            type: 'datetime',
+            title: {
+                text: '日期'
+            },
+            labels: {
+                step: 1,
+                formatter: function () {
+                    return Highcharts.dateFormat('%Y-%m-%d', this.value);
+                }
+            }
+
+        },
+        yAxis: {
+            title: {}
+        },
+        tooltip: {
+            valueDecimals: 0,
+            formatter: function () {
+                if ("下载量" === this.series.name) {
+                    return '<b>' + Highcharts.dateFormat('%Y-%m-%d', this.x) + '</b><br/>' + '下载量:' + Highcharts.numberFormat((this.y) / 1024 / 1024, 0, '.', ',') + 'MB';
+                } else {
+                    return '<b>' + Highcharts.dateFormat('%Y-%m-%d', this.x) + '</b><br/>' + this.series.name + ':' + Highcharts.numberFormat((this.y), 0, '.', ',');
+                }
+            }
+        },
+        series: [{
+            type: 'line',
+            name: '访问人次',
+            data: listVisits,
+            lineWidth: 0.8
+        }]
+    });
+    $('#dataByDay').highcharts().addSeries({
+        name: '网页访问数',
+        data: listPages
+    });
+    $('#dataByDay').highcharts().addSeries({
+        name: '请求数',
+        data: listHits
+    });
+    $('#dataByDay').highcharts().addSeries({
+        name: '下载量',
+        data: listBandwidth
+    });
+</script>
+<script th:inline="javascript" type="text/javascript">
+
+</script>
+<script th:inline="javascript" type="text/javascript">
+    $(document).ready(function () {
+        //设置当前节点
+        var selectVal = $("#groupIdSelect").text();
+        var objSel = $("header").find('#groupsList');
+        var text = null;
+        var ops = objSel.find("option");
+
+        for (var i = 0; i < ops.length; i++) {
+            if (selectVal == ops[i].value) {
+                text = ops[i].text;    //返回当前选定值对应的显示值
+            }
+        }
+        $("#groupSelect").text(text);
+
+        //1、设置查询时间默认选中项
+        $("input[name='quarter'][value='year']").attr("checked", true);
+
+        //按每月统计（表格）
+        var resultList = [[${dataStatReport.rowsMonth}]] == null ? [] : [[${dataStatReport.rowsMonth}]];
+        var dynamicHeader = [];
+        dynamicHeader.push({
+            field: 'dayTime',
+            title: '月份',
+            align: 'center',
+            valign: "middle",
+            width: 200,
+            formatter: function (value) {
+                return value.toString().substr(0, 4) + "年" + value.toString().substr(4, 2) + "月";
+            },
+            footerFormatter: function (value) {
+                return "总计";
+            }
+        }, {
+            field: 'IPMonth',
+            title: '独立IP数',
+            align: 'center',
+            width: 200,
+            valign: "middle",
+            formatter: function (value,
+                                 row, index) {
+                var valu = Highcharts.numberFormat((value), 0, '.', ',');
+                return valu;
+            },
+            footerFormatter: function (value) {
+                var count = 0;
+                for (var i in value) {
+                    count += value[i].IPMonth;
+                }
+                return count;
+            }
+        }, {
+            field: 'VisitMonth',
+            title: '访问人次',
+            width: 200,
+            align: 'center',
+            valign: "middle",
+            formatter: function (value,
+                                 row, index) {
+                var valu = Highcharts.numberFormat((value), 0, '.', ',');
+                return valu;
+            },
+            footerFormatter: function (value) {
+                var count = 0;
+                for (var i in value) {
+                    count += value[i].VisitMonth;
+                }
+                return count;
+            }
+        }, {
+            field: 'PagesMonth',
+            title: '页面访问数',
+            formatter: function (value,
+                                 row, index) {
+                var valu = Highcharts.numberFormat((value), 0, '.', ',');
+                return valu;
+            },
+            width: 200,
+            align: 'center',
+            valign: "middle",
+            footerFormatter: function (value) {
+                var count = 0;
+                for (var i in value) {
+                    count += value[i].PagesMonth;
+                }
+                return count;
+            },
+            sortable: true
+        }, {
+            field: 'HitsMonth',
+            title: '请求数',
+            width: 200,
+            formatter: function (value,
+                                 row, index) {
+                var valu = Highcharts.numberFormat((value), 0, '.', ',');
+                return valu;
+            },
+            align: 'center',
+            valign: "middle",
+            footerFormatter: function (value) {
+                var count = 0;
+                for (var i in value) {
+                    count += value[i].HitsMonth;
+                }
+                return count;
+            }
+        }, {
+            field: 'BandMonth',
+            title: '下载量（MB）',
+            width: 200,
+
+            align: 'center',
+            valign: "middle",
+            class: 'number-thousands',
+            formatter: function (value,
+                                 row, index) {
+                var valu = (value / 1024 / 1024).toFixed(2) + "MB";
+                return valu;
+            },
+            footerFormatter: function (value) {
+                var count = 0;
+                for (var i in value) {
+                    count += value[i].BandMonth;
+                }
+                return ((count / 1024 / 1024).toFixed(2) + "MB");
+            }
+        });
+        $('#dataTableMonth').bootstrapTable({
+            data: resultList,
+            columns: dynamicHeader,
+            showFooter: true,
+            sortable: true,   //是否启用排序
+        });
+        $('#dataTableMonth').bootstrapTable('hideLoading');
+    });
+    $(document).ready(function () {
+        //设置统计时段
+        var pDate = new Date;
+        var pYear = pDate.getFullYear(); //获取当前年
+        $("#period").text(pYear + "年");
+
+        var resultList = [[${dataStatReport.rowsDay}]] == null ? [] : [[${dataStatReport.rowsDay}]];
+        var dynamicHeader = [];
+        dynamicHeader.push({
+            field: 'dayTime',
+            title: '时间段',
+            align: 'center',
+            valign: "middle",
+            formatter: function (value) {
+                return value.toString().substr(0, 4) + "年" + value.toString().substr(4, 2) + "月" + value.toString().substr(6, 2) + "日";
+            },
+        }, {
+            field: 'PagesDay',
+            title: '页面访问数',
+            align: 'center',
+            valign: "middle",
+            formatter: function (value, row, index) {
+                var valu = Highcharts.numberFormat((value), 0, '.', ',');
+                return valu;
+            }
+        }, {
+            field: 'VisitsDay',
+            title: '访问人次',
+            align: 'center',
+            valign: "middle",
+            formatter: function (value, row, index) {
+                var valu = Highcharts.numberFormat((value), 0, '.', ',');
+                return valu;
+            }
+        }, {
+            field: 'HitsDay',
+            title: '请求数',
+            align: 'center',
+            valign: "middle",
+            formatter: function (value, row, index) {
+                var valu = Highcharts.numberFormat((value), 0, '.', ',');
+                return valu;
+            }
+        }, {
+            field: 'BandDay',
+            title: '下载量（MB）',
+            align: 'center',
+            valign: 'middle',
+            class: 'number-thousands',
+            formatter: function (value,
+                                 row, index) {
+                var valu = (value / 1024 / 1024).toFixed(2) + "MB";
+                return valu;
+            },
+        });
+        $('#dataTableDay').bootstrapTable({
+            data: resultList,
+            columns: dynamicHeader,
+            showFooter: true
+        });
+        $('#dataTableDay').bootstrapTable('hideLoading');
+
+
+        var countryCount = [[${dataStatReport.countryCount}]] == null ? [] : [[${dataStatReport.countryCount}]];
+
+        Highcharts.chart('countryChart', {
+            chart: {
+                type: 'pie'
+            },
+            title: {
+                text: "用户来源统计（国家）"
+            },
+            tooltip: {
+                pointFormat: '<b>IP数：{point.y}<br/>比率:{point.percentage:.2f}%</b>',
+            },
+            xAxis: {
+                categories: [],
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    dataLabels: {
+                        enabled: true,
+                    },
+                    showInLegend: true
+                },
+            },
+            legend: {
+                layout: "vertical",
+                align: "left",
+                verticalAlign: "center",
+                itemMarginBottom: 10,
+                x: 150,
+                y: 70,
+                labelFormatter: function () {
+                    return this.name + "(" + this.percentage.toFixed(2) + "%)";
+                }
+            },
+            series: [
+                {
+                    name: "站点",
+                    data: []
+                }
+            ]
+        });
+        var pieData = new Array();
+        var Top10Data = new Array();
+        var countSum = 0;
+        //null
+        for (var i = 0; i < countryCount.length; i++) {
+            pieData.push({name: countryCount[i].domain, y: parseInt(countryCount[i].ips)});
+            countSum = countSum + countryCount[i].ips;
+        }
+        Top10Data = pieData.slice(0, 9);
+        var elseData = 0;
+        for (var j = 0; j < Top10Data.length; j++) {
+            elseData = elseData + parseInt(Top10Data[j].y);
+        }
+        if (countryCount.length > 9) {
+            Top10Data.push({name: "其他", y: countSum - elseData});
+        }
+
+        $('#countryChart').highcharts().series[0].setData(Top10Data);
+        //国家或地区表格
+        var dynamicHeader = [];
+        dynamicHeader.push({
+            field: 'domain',
+            title: '来源地区',
+            width: 500,
+            align: 'center',
+            valign: 'middle'
+        }, {
+            field: 'ips',
+            title: 'IP数',
+            width: 200,
+            align: 'center',
+            valign: 'middle',
+            class: 'number-thousands'
+        }, {
+            field: 'pages',
+            title: '网页访问数',
+            width: 200,
+            align: 'center',
+            valign: 'middle',
+            class: 'number-thousands'
+        }, {
+            field: 'hits',
+            title: '请求数',
+            width: 200,
+            align: 'center',
+            valign: 'middle',
+            class: 'number-thousands'
+        }, {
+            field: 'downloads',
+            title: '下载量(MB)',
+            width: 200,
+            align: 'center',
+            valign: 'middle',
+            formatter: function (value,
+                                 row, index) {
+                var valu = (value / 1024 / 1024).toFixed(2) + "MB";
+                return valu;
+            }
+        });
+        $('#countryTable').bootstrapTable({
+            columns: dynamicHeader,
+            showFooter: true
+        });
+        $('#countryTable').bootstrapTable('hideLoading');
+        $("#countryTable").bootstrapTable('append', countryCount);
+    });
+</script>
+<script type="text/javascript">
+
+    // 初始化时间插件
+    var $datetimepickerBegin = $('#datetimepicker10');
+    var beginDate = new Date();
+    $datetimepickerBegin.datepicker({
+        minViewMode: 1, // 最小显示为月份
+        autoclose: true, // 自动关闭
+        endDate: new Date(),
+        format: 'yyyy/mm',
+        language: 'zh-CN'
+    }).on("changeDate", function (date) {
+        beginDate = date.date;
+        initDatetimepickerEnd();
+    });
+
+
+    var $datetimepickerEnd = $('#datetimepicker11');
+
+    function initDatetimepickerEnd() {
+        $datetimepickerEnd.datepicker("destroy");
+        $datetimepickerEnd.datepicker({
+            minViewMode: 1,
+            autoclose: true,
+            endDate: new Date(),
+            format: 'yyyy/mm',
+            language: 'zh-CN',
+            startDate: beginDate,
+            beforeShowMonth: function (date) {
+                var time = $datetimepickerBegin.val().split("\/");
+                if (date < new Date(time[0], time[1] - 1, 1)) {
+                    return false;
+                }
+            }
+        });
+    }
+
+    initDatetimepickerEnd();
+
+    var $datetimepickerMonth = $('#datetimepicker101');
+    $datetimepickerMonth.datepicker({
+        minViewMode: 1,
+        autoclose: true,
+        format: 'yyyy/mm',
+        language: 'zh-CN'
+    });
+    /**
+     * 季度选择 准备ajax数据
+     */
+    $("#quarter input[name='quarter']").on("change", function () {
+        var _this = this;
+        var symbol = _this.value;
+        var timeConvert = msisAPP.radioTimeConvert(symbol);
+        var startDate = timeConvert.begin;
+        var endDate = timeConvert.end;
+        var groupsList = $("#groupsList option:selected");
+        var groupID = groupsList.val();
+        $("#period").text(startDate.substring(0, 4) + "年" + startDate.substring(4, 6) + "月至" + endDate.substring(0, 4) + "年" + endDate.substring(4, 6) + "月");
+        selectData(groupID, startDate, endDate);
+    });
+
+    /**
+     * 点击查询按钮时数据准备 及查询月份显示
+     */
+    function selectTimeTest() {
+        if ($datetimepickerBegin.val().length === 0 || $datetimepickerEnd.val().length === 0) {
+            $.myNotify.warning("请选择完整时间！");
+            return;
+        }
+        var begin = msisAPP.selectTimeConvert($datetimepickerBegin.val());
+        var end = msisAPP.selectTimeConvert($datetimepickerEnd.val());
+        var startDate = begin.begin;
+        var endDate = end.end;
+        var groupsList = $("#groupsList option:selected");
+        var groupID = groupsList.val();
+        $("#period").text(startDate.substring(0, 4) + "年" + startDate.substring(4, 6) + "月至" + endDate.substring(0, 4) + "年" + endDate.substring(4, 6) + "月");
+        selectData(groupID, startDate, endDate);
+    };
+
+    /**
+     * ajax获得数据
+     * @param groupID
+     * @param startDate
+     * @param endDate
+     */
+    function selectData(groupID, startDate, endDate) {
+        var param = $("body .groupId").text();
+        var href = "../integrator/dataStat/timeAnalyse/getData" + param;
+        // alert(href);
+        $.ajax({
+            type: "POST",
+            url: href,
+            data: {"groupID": groupID, "startDate": startDate, "endDate": endDate},
+            dataType: "json",
+            beforeSend: function () {
+            },
+            success: function (data) {
+                //重新加载数据
+                $("body #SumTotalUnique").text(data.sumTotalUnique);
+                $("body #SumTotalVisits").text(data.sumTotalVisits);
+                $("body #Pages").text(data.pages);
+                $("body #Hits").text(data.hits);
+                $("body #Bandwidth").text(data.bandwidth);
+                $("body #RobotPages").text(data.robotPages);
+                $("body #RobotHits").text(data.robotHits);
+                $("body #RobotBandwidth").text(data.robotBandwidth);
+                $("body #RobotPages").text(data.robotPages);
+
+                //${'('+#numbers.formatDecimal((dataStatReport.getSumTotalVisits().doubleValue())/(dataStatReport.getSumTotalUnique().doubleValue()),0,2) +'访问人次/独立IP)'}
+                var VisitsIP = '(' + ((data.sumTotalVisits / data.sumTotalUnique).toFixed(2)) + '访问人次/独立IP)';
+                var PagesVisits = '(' + (data.pages / data.sumTotalVisits).toFixed(2) + '页面访问数/访问人次)';
+                var HitsVisits = '(' + (data.hits / data.sumTotalVisits).toFixed(2) + '文件数/访问人次)';
+                var BandwidthVisits = '(' + (data.bandwidth / data.sumTotalVisits).toFixed(2) + '字节/访问人次)';
+                if (data.sumTotalUnique == 0) {
+                    var VisitsIP = '(- -访问人次/独立IP)';
+                }
+                if (data.sumTotalVisits == 0) {
+                    var PagesVisits = '(- -页面访问数/访问人次)';
+                    var HitsVisits = '(- -文件数/访问人次)';
+                    var BandwidthVisits = '(- -字节/访问人次)';
+                }
+
+                $("body #VisitsIP").text(VisitsIP);
+                $("body #PagesVisits").text(PagesVisits);
+                $("body #HitsVisits").text(HitsVisits);
+                $("body #BandwidthVisits").text(BandwidthVisits);
+
+                if (data.ipmonth == null) {
+                    data.ipmonth = [];
+                }
+                $.each(data.ipmonth, function (index) {
+                    var time = data.ipmonth[index][0];
+                    var year = Math.floor(time / 10000);
+                    var month = Math.floor(time % 10000 / 100);
+                    var date = Date.UTC(year, month - 1);
+                    data.ipmonth[index][0] = date;
+                });
+                $('#dataByMonth').highcharts().series[0].update({
+                    data: data.ipmonth
+                });
+
+                if (data.visitMonth == null) {
+                    data.visitMonth = [];
+                }
+                $.each(data.visitMonth, function (index) {
+                    var time = data.visitMonth[index][0];
+                    var year = Math.floor(time / 10000);
+                    var month = Math.floor(time % 10000 / 100);
+                    var date = Date.UTC(year, month - 1);
+                    data.visitMonth[index][0] = date;
+                });
+
+                $('#dataByMonth').highcharts().series[1].update({
+                    data: data.visitMonth
+                });
+
+                if (data.pageMonth == null) {
+                    data.pageMonth = [];
+                }
+                $.each(data.pageMonth, function (index) {
+                    var time = data.pageMonth[index][0];
+                    var year = Math.floor(time / 10000);
+                    var month = Math.floor(time % 10000 / 100);
+                    var date = Date.UTC(year, month - 1);
+                    data.pageMonth[index][0] = date;
+                });
+
+                $('#dataByMonth').highcharts().series[2].update({
+                    data: data.pageMonth
+                });
+
+                if (data.hitsMonth == null) {
+                    data.hitsMonth = [];
+                }
+                $.each(data.hitsMonth, function (index) {
+                    var time = data.hitsMonth[index][0];
+                    var year = Math.floor(time / 10000);
+                    var month = Math.floor(time % 10000 / 100);
+                    var date = Date.UTC(year, month - 1);
+                    data.hitsMonth[index][0] = date;
+                });
+                $('#dataByMonth').highcharts().series[3].update({
+                    data: data.hitsMonth
+                });
+
+                if (data.bandwidthMonth == null) {
+                    data.bandwidthMonth = [];
+                }
+                $.each(data.bandwidthMonth, function (index) {
+                    var time = data.bandwidthMonth[index][0];
+                    var year = Math.floor(time / 10000);
+                    var month = Math.floor(time % 10000 / 100);
+                    var date = Date.UTC(year, month - 1);
+                    data.bandwidthMonth[index][0] = date;
+                });
+                $('#dataByMonth').highcharts().series[4].update({
+                    data: data.bandwidthMonth
+                });
+
+                // 每日量折线图
+                var listVisits = data.visitDay == null ? [] : data.visitDay;
+                $.each(listVisits, function (index) {
+                    var time = listVisits[index][0];
+                    var year = Math.floor(time / 10000);
+                    var month = Math.floor(time % 10000 / 100);
+                    var day = time % 10000 % 100;
+                    var date = Date.UTC(year, month - 1, day);
+                    listVisits[index][0] = date;
+                });
+                var listPages = data.pageDay == null ? [] : data.pageDay;
+                $.each(listPages, function (index) {
+                    var time = listPages[index][0];
+                    var year = Math.floor(time / 10000);
+                    var month = Math.floor(time % 10000 / 100);
+                    var day = time % 10000 % 100;
+                    var date = Date.UTC(year, month - 1, day);
+                    listPages[index][0] = date;
+                });
+                var listHits = data.hitsDay == null ? [] : data.hitsDay;
+                $.each(listHits, function (index) {
+                    var time = listHits[index][0];
+                    var year = Math.floor(time / 10000);
+                    var month = Math.floor(time % 10000 / 100);
+                    var day = time % 10000 % 100;
+                    var date = Date.UTC(year, month - 1, day);
+                    listHits[index][0] = date;
+                });
+                var listBandwidth = data.bandwidthDay == null ? [] : data.bandwidthDay;
+
+                $.each(listBandwidth, function (index) {
+                    var time = listBandwidth[index][0];
+                    var year = Math.floor(time / 10000);
+                    var month = Math.floor(time % 10000 / 100);
+                    var day = time % 10000 % 100;
+                    var date = Date.UTC(year, month - 1, day);
+                    listBandwidth[index][0] = date;
+                });
+                $('#dataByDay').highcharts().series[0].update({
+                    data: listVisits
+                });
+                $('#dataByDay').highcharts().series[1].update({
+                    data: listPages
+                });
+                $('#dataByDay').highcharts().series[2].update({
+                    data: listHits
+                });
+                $('#dataByDay').highcharts().series[3].update({
+                    data: listBandwidth
+                });
+                //表格
+                // }//更新表格数据
+                $("#dataTableMonth").bootstrapTable('removeAll');
+                $("#dataTableMonth").bootstrapTable('append', data.rowsMonth);
+
+                //更新表格数据
+                $("#dataTableDay").bootstrapTable('removeAll');
+                $("#dataTableDay").bootstrapTable('append', data.rowsDay);
+
+                //更新国家或地区前十表格数据
+                let mapDomain = data.countryCount == null ? [] : data.countryCount;
+                $("#countryTable").bootstrapTable('removeAll');
+                $("#countryTable").bootstrapTable('append', mapDomain);
+
+
+                var pieData = new Array();
+                var Top10Data = new Array();
+                var countSum = 0;
+                //null
+                data.countryCount == null ? [] : data.countryCount;
+                for (var i = 0; i < data.countryCount.length; i++) {
+                    pieData.push({name: data.countryCount[i].domain, y: parseInt(data.countryCount[i].ips)});
+                    countSum = countSum + data.countryCount[i].ips;
+                }
+                Top10Data = pieData.slice(0, 9);
+                var elseData = 0;
+                for (var j = 0; j < Top10Data.length; j++) {
+                    elseData = elseData + parseInt(Top10Data[j].y);
+                }
+                if (data.countryCount.length > 9) {
+                    Top10Data.push({name: "其他", y: countSum - elseData});
+                }
+                $('#countryChart').highcharts().series[0].setData(Top10Data);
+
+                msisAPP.numberFormat();
+            },
+            error: function () {
+                // alert("1error");
+            }
+        });
+    };
+    // 格式化数字显示
+    msisAPP.numberFormat();
+</script>
+</body>
+</html>

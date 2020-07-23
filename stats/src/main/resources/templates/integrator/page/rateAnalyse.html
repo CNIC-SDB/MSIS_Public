@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <title>数据服务监控与统计系统</title>
+</head>
+<body>
+<section class="container rateAnalyse">
+    <div class="row">
+        <div class="col-md-12">
+            当前节点:<strong class="" id="groupSelect"></strong>
+            <div class="height-20"></div>
+            <strong class="" id="groupIdSelect" style="float: right;display: none"
+                    th:text="${dataStatReport.getId()}"></strong>
+            <script th:inline="javascript" type="text/javascript">
+                var selectVal = $("#groupIdSelect").text();
+                var objSel = $("header").find('#groupsList');
+                var text = null;
+                var ops = objSel.find("option");
+                for (var i = 0; i < ops.length; i++) {
+                    if (selectVal == ops[i].value) {
+                        text = ops[i].text;    //返回当前选定值对应的显示值
+                    }
+                }
+                $("#groupSelect").text(text);
+            </script>
+            <strong class="groupId" id="groupId" style="float: right"
+                    th:text="'?groupID='+${dataStatReport.getId()}"></strong>
+            <ul class="nav nav-pills nav-justified ar-nav-pills center-block margin-bottom">
+                <li><a class="href" href="#integrator/dataStat/synthesize">综合报告</a></li>
+                <li><a class="href" href='#integrator/dataStat/timeAnalyse'>时段分析</a></li>
+                <li><a class="href" href="#integrator/dataStat/fromAnalyse">来源分析</a></li>
+                <li><a class="href" href="#integrator/dataStat/naturalAnalyse">资源分析</a></li>
+                <li><a class="href" href="#integrator/dataStat/siteAnalyse">站点状态监测</a></li>
+                <li class="active"><a class="href" href="">服务正常率时段分析</a></li>
+            </ul>
+            <div class="panel panel-primary">
+                <div class="panel-heading">服务正常率时段分析</div>
+                <div class="panel-body" id="quarter">
+                    <div class="form-group">
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="year">
+                            本年
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="quarter-1">
+                            一季度
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="quarter-2">
+                            二季度
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="quarter-3">
+                            三季度
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="quarter-4">
+                            四季度
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="halfYear-1">
+                            上半年
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="halfYear-2">
+                            下半年
+                        </label>
+                    </div>
+                    <div class="" id="chooseMonth">
+                        自定义起始年月
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <div class="input-group date">
+                                        <input class="form-control" id="datetimepicker10" type="text"/>
+                                        <span class="input-group-addon"><span
+                                                class="glyphicon glyphicon-calendar"></span>
+                </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <div class="input-group date">
+                                        <input class="form-control" id="datetimepicker11" type="text"/>
+                                        <span class="input-group-addon"><span
+                                                class="glyphicon glyphicon-calendar"></span>
+                </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-ar btn-primary" id="chooseYearMonth" onclick="selectTimeTest();"
+                                    type="submit">查询
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-primary">
+                <div class="panel-heading"> 统计时段：
+                    <strong id="period" th:text="20"></strong></div>
+                <div class="panel-body" id="dataChart">
+                </div>
+                <div class="panel-body" id="dataTable" style="width: 100%">
+                </div>
+            </div>
+            <script th:inline="javascript">
+                // 数据访问量饼状图
+                var GroupRate = [[${dataStatReport.GroupRate}]];
+                if (GroupRate == null) {
+                    GroupRate = [];
+                }
+                var arrData = [];
+                $.each(GroupRate, function (index) {
+                    var time = GroupRate[index][0];
+                    var year = Math.floor(time / 10000);
+                    var month = Math.floor(time % 10000 / 100);
+                    var day = time % 10000 % 100;
+                    var date = Date.UTC(year, month - 1, day);
+                    GroupRate[index][0] = date;
+                });
+
+                Highcharts.chart('dataChart', {
+                    chart: {
+                        zoomType: 'x'
+                    },
+                    boost: {
+                        useGPUTranslations: true
+                    },
+                    title: {
+                        text: '每日服务正常率统计'
+                    },
+                    xAxis: {
+                        type: 'datetime',
+                        title: {
+                            text: '日期'
+                        },
+                        labels: {
+                            step: 1,
+                            formatter: function () {
+                                return Highcharts.dateFormat('%Y-%m-%d', this.value);
+                            }
+                        }
+
+                    },
+                    yAxis: {
+                        title: {
+                            text: '服务正常率'
+                        },
+                        labels: {
+                            step: 1,
+                            formatter: function () {
+                                return Highcharts.numberFormat((this.value / 100), 2) + '%';
+                            }
+                        }
+                    },
+                    tooltip: {
+                        valueDecimals: 0,
+                        formatter: function () {
+                            return '<b>' + Highcharts.dateFormat('%Y-%m-%d', this.x) + '</b><br/>' + '服务正常率:' + Highcharts.numberFormat((this.y) / 100, 0, '.', ',') + '%';
+                        }
+                    },
+                    series: [{
+                        type: 'line',
+                        name: '服务正常率',
+                        data: GroupRate,
+                        lineWidth: 0.8
+                    }]
+                });
+
+                // 服务正常率表格
+                $(document).ready(function () {
+                    var resultList = [[${dataStatReport.GroupRateList}]];
+                    var lengrh = resultList.length;
+                    var dynamicHeader = [];
+                    dynamicHeader.push({
+                        field: 'dayTime',
+                        title: '日期',
+                        align: 'center',
+                        width: 550,
+                        valign: "middle",
+                        formatter: function (value) {
+                            return value.toString().substr(0, 4) + "年" + value.toString().substr(4, 2) + "月" + value.toString().substr(6, 8) + "日";
+                        },
+                        footerFormatter: function (value) {
+                            return ("总计");
+                        }
+                    }, {
+                        field: 'RateNum',
+                        title: '服务正常率',
+                        align: 'center',
+
+                        width: 550,
+                        valign: "middle",
+                        formatter: function (value,
+                                             row, index) {
+                            var valu = (value / 100).toFixed(2) + "%";
+                            return valu;
+                        },
+                        footerFormatter: function (value, row, index) {
+                            var count = 0;
+                            for (var i in value) {
+                                count += value[i].RateNum;
+                            }
+                            if (count == 0) {
+                                return "0.00%";
+                            }
+                            return ((count / 100 / (i)).toFixed(2) + "%");
+                        }
+                    });
+                    $('#dataTable').bootstrapTable({
+                        data: resultList,
+                        columns: dynamicHeader,
+                        showFooter: true,
+                        sortable: true,   //是否启用排序
+                    });
+                    $('#dataTable').bootstrapTable('hideLoading');
+                    //设置查询时间默认选中项
+                    $("input[name='quarter'][value='year']").attr("checked", true);
+
+                });
+            </script>
+        </div>
+    </div>
+</section>
+<script th:inline="javascript" type="text/javascript">
+    $(document).ready(function () {
+        //设置统计时段
+        var pDate = new Date;
+        var pYear = pDate.getFullYear(); //获取当前年
+        $("#period").text(pYear + "年");
+        var ave = $(".fixed-table-footer table tbody tr td:last .th-inner").text();
+        $('#mean').text(ave);
+    });
+
+
+    // 初始化时间插件
+    var $datetimepickerBegin = $('#datetimepicker10');
+    var beginDate = new Date();
+    $datetimepickerBegin.datepicker({
+        minViewMode: 1, // 最小显示为月份
+        autoclose: true, // 自动关闭
+        format: 'yyyy/mm',
+        endDate: new Date(),
+        language: 'zh-CN'
+    }).on("changeDate", function (date) {
+        beginDate = date.date;
+        initDatetimepickerEnd();
+    });
+
+
+    var $datetimepickerEnd = $('#datetimepicker11');
+
+    function initDatetimepickerEnd() {
+        $datetimepickerEnd.datepicker("destroy");
+        $datetimepickerEnd.datepicker({
+            minViewMode: 1,
+            autoclose: true,
+            format: 'yyyy/mm',
+            language: 'zh-CN',
+            endDate: new Date(),
+            startDate: beginDate,
+            beforeShowMonth: function (date) {
+                var time = $datetimepickerBegin.val().split("\/");
+                if (date < new Date(time[0], time[1] - 1, 1)) {
+                    return false;
+                }
+            }
+        });
+    }
+
+    initDatetimepickerEnd();
+
+    var $datetimepickerMonth = $('#datetimepicker101');
+    $datetimepickerMonth.datepicker({
+        minViewMode: 1,
+        autoclose: true,
+        endDate: new Date(),
+        format: 'yyyy/mm',
+        language: 'zh-CN'
+    });
+
+    $("#quarter input[name='quarter']").on("change", function () {
+        var _this = this;
+        var symbol = _this.value;
+        var timeConvert = msisAPP.radioTimeConvert(symbol);
+        var startDate = timeConvert.begin;
+        var endDate = timeConvert.end;
+        var groupsList = $("#groupsList option:selected");
+        var groupID = groupsList.val();
+        var orderBy = "hits";
+        $("#period").text(startDate.toString().substring(0, 4) + "年" + startDate.toString().substring(4, 6) + "月" + endDate.toString().substring(0, 4) + "年" + endDate.toString().substring(4, 6) + "月");
+        selectData(groupID, startDate, endDate);
+    });
+
+    function selectTimeTest() {
+        if ($datetimepickerBegin.val().length === 0 || $datetimepickerEnd.val().length === 0) {
+            $.myNotify.warning("请选择完整时间！");
+            return;
+        }
+        var begin = msisAPP.selectTimeConvert($datetimepickerBegin.val());
+        var end = msisAPP.selectTimeConvert($datetimepickerEnd.val());
+        var startDate = begin.begin;
+        var endDate = end.end;
+        var groupsList = $("#groupsList option:selected");
+        var groupID = groupsList.val();
+        var orderBy = "hits";
+        $("#period").text(startDate.substring(0, 4) + "年" + startDate.substring(4, 6) + "月至" + endDate.substring(0, 4) + "年" + endDate.substring(4, 6) + "月");
+        selectData(groupID, startDate, endDate);
+    };
+
+    $("input[name='choose']").on("change", function () {
+        var orderBy = this.value;
+        var val = $('input:radio[name="quarter"]:checked').val();
+        var begin = msisAPP.selectTimeConvert($datetimepickerBegin.val());
+        var startDate = null;
+        var endDate = null;
+        if (val != null) {
+            var symbol = $('input:radio[name="quarter"]:checked').val();
+            var timeConvert = msisAPP.radioTimeConvert(symbol);
+            startDate = timeConvert.begin;
+            endDate = timeConvert.end;
+        } else if (begin.begin != "0101") {
+            var begin = msisAPP.selectTimeConvert($datetimepickerBegin.val());
+            var end = msisAPP.selectTimeConvert($datetimepickerEnd.val());
+            startDate = begin.begin;
+            endDate = end.end;
+            //$("#period").text(startDate.toString().substring(0,4)+"年"+startDate.toString().substring(4,6)+"月");
+            $("#period").text(startDate.toString().substring(0, 4) + "年" + startDate.toString().substring(4, 6) + "月" + endDate.toString().substring(0, 4) + "年" + endDate.toString().substring(4, 6) + "月");
+
+        }
+        var groupsList = $("#groupsList option:selected");
+        var groupID = groupsList.val();
+        selectData(groupID, startDate, endDate);
+    });
+
+    function selectData(groupID, startDate, endDate) {
+        var param = $("body .groupId").text();
+        var href = "../integrator/dataStat/rateAnalyse/getData" + param;
+        $.ajax({
+            type: "POST",
+            url: href,
+            data: {"groupID": groupID, "startDate": startDate, "endDate": endDate,},
+            dataType: "json",
+            beforeSend: function () {
+            },
+            success: function (data) {
+                //$('#dataTable').bootstrapTable('destroy');
+                if ($('#dataChart').highcharts().series[0] != null) {
+                }
+                var groupRateList = data.groupRate == null ? [] : data.groupRate;
+                var length = groupRateList.length;
+                var sum = 0
+                $.each(groupRateList, function (index) {
+                    var time = groupRateList[index][0];
+                    sum = sum + groupRateList[index][1];
+                    var year = Math.floor(time / 10000);
+                    var month = Math.floor(time % 10000 / 100);
+                    var day = time % 10000 % 100;
+                    var date = Date.UTC(year, month - 1, day);
+
+                    groupRateList[index][0] = date;
+                });
+                var mean = sum / length;
+                $('#dataChart').highcharts().redraw();
+                $('#dataChart').highcharts().series[0].setData(groupRateList);
+                $("#dataTable").bootstrapTable('removeAll');
+                $("#dataTable").bootstrapTable('append', data.groupRateList);
+            }
+        });
+    }
+</script>
+</body>
+</html>

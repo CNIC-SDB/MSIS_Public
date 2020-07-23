@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+>
+<body>
+<!--左侧菜单栏目-->
+<div class="col-md-3" id="wer" style="width:15%" th:fragment="content-sidebar">
+    <ul class="sidebar-nav animated fadeIn">
+
+        <!--院所管理-->
+        <li shiro:hasRole="ROLE_ADMIN">
+            <a class="blod "><i class="fa fa-user"></i>
+                [[#{organization.name}]]管理</a>
+
+            <ul class="menu-submenu list-unstyled collapse show in " id="coll-user">
+                <li><a class="" href="#user/list"><i class="fa fa-list"></i> [[#{organization.name}]]列表</a>
+                </li>
+            </ul>
+        </li>
+
+        <!--站点管理-->
+        <li>
+            <a class="blod"><i class="fa fa-circle"></i>
+                站点管理</a>
+
+            <ul class="menu-submenu list-unstyled collapse show in" id="coll-site">
+                <li><a href="#site/list"><i class="fa fa-list"></i>
+                    站点列表</a>
+                </li>
+
+            </ul>
+        </li>
+
+        <!--站点群管理-->
+        <li>
+            <a class="blod"><i class="fa fa-sitemap"></i>
+                站点群管理</a>
+
+            <ul class="menu-submenu list-unstyled collapse show in" id="coll-group">
+                <li shiro:hasRole="ROLE_ADMIN">
+                    <a href="#group/tree"><i class="fa fa-edit"></i>菜单树管理</a>
+                </li>
+
+                <li shiro:hasRole="ROLE_ADMIN">
+                    <a href="#group/node"><i class="fa fa-cubes"></i> 统计节点分组</a>
+                </li>
+
+                <li shiro:hasRole="ROLE_USER">
+                    <a href="#group/institute"><i class="fa fa-cubes"></i>[[#{organization.name}]]站点群</a>
+                </li>
+            </ul>
+        </li>
+
+        <!--个人信息管理-->
+        <li shiro:hasRole="ROLE_USER">
+            <a class="blod "><i class="fa fa-user"></i>个人信息管理</a>
+
+            <ul class="menu-submenu list-unstyled collapse show in " id="coll-userInfo">
+                <li>
+                    <a href="#user/editPassword"><i class="fa fa-list"></i> 密码修改</a>
+                </li>
+                <li>
+                    <a href="#user/changeMailStatus"><i class="fa fa-info-circle"></i> 邮件提醒设置</a>
+                </li>
+
+            </ul>
+        </li>
+
+        <script th:inline="javascript">
+
+            $(".menu-submenu li").on("click", function () {
+                $(this).parent().find("a").removeClass("gray");
+                var index = $(this).parent().parent().index();//获取当前点击的li是一级ul中的第几个
+                $(this).parent().parent().parent().find('.menu-submenu').each(function () {//循环一级ul下的li
+                    var index2 = $(this).parent().index();//获取当前的li是一级ul中的第几个
+                    if (index != index2) {
+                        $(this).find("a").removeClass("gray");
+                    }
+                });
+                $(this).children("a").addClass("gray");
+                $(this).children("a").addClass("borderc");
+            })
+        </script>
+    </ul>
+
+
+</div>
+</body>
+
+</html>

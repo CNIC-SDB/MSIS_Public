@@ -1,0 +1,96 @@
+# 159.226.28.144 服务器运行配置文件
+server:
+  tomcat:
+    uri-encoding: UTF-8
+    accesslog:
+      buffered: true
+      directory: ${user.dir}/logs
+      enabled: true
+      file-date-format: .yyyy-MM-dd
+      pattern: common
+      prefix: access_log
+      rename-on-rotate: false
+      request-attributes-enabled: false
+      rotate: true
+      suffix: .log
+  servlet:
+    session:
+      cookie:
+        http-only: true
+      timeout: 8H
+
+
+spring:
+
+  output:
+    ansi:
+      enabled: ALWAYS # 输出带颜色的日志信息
+
+  mvc:
+    favicon:
+      enabled: false
+    view: # 视图相关
+      prefix: /templates/
+      suffix: .html
+
+  thymeleaf:
+    cache: true
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/webstats
+    username: root
+    password: 123456
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  cache:
+    ehcache:
+      config: classpath:ehcache.xml
+
+  jpa:
+    database: MySQL # 指定数据库类型
+    show-sql: true # 显示sql语句
+    open-in-view: true
+
+logging:
+  config: classpath:logback-spring.xml
+
+
+custom:
+  #  awstats配置文件根路径
+  awstatsConfigurationPath: /etc/awstats
+  # awstats根路径
+  awstatsRootPath: /usr/local/awstats
+  #  awstats解析结果根路径
+  awstatsResultPath: /var/lib/awstats
+  #  原始日志文件根路径
+  #  logFilePath: /usr/local/sdc/data/logfile
+  #  ftp根路径
+  ftpRootPath: /usr/local/sdc/msis109/ftp
+  #  ftp根路径创建脚本
+  createFtpDir: createftpdir.sh
+  # 密码加密盐值
+  salt: msis
+  #系统登录地址
+  url: msis.csdb.cn/manage
+  #后台管理用户title
+  userTitle: 院所
+  # 连续异常小时数
+  monitor:
+    hours: 5
+#邮件设置
+mail:
+  smtp:
+    auth: true
+    host: smtp.cnic.cn
+  transport:
+    protocol: smtp
+    # 邮件发送地址
+  senderAddress: test@cnic.cn
+  #邮箱账号
+  senderAccount: test@cnic.cn
+  #邮箱密码
+  senderPassword: 123456
+  #用户信息邮件主题
+  userMessageSubject: 数据服务监控与统计系统-初始化信息
+  #监控异常邮件主题
+  monitorMessageSubject: 数据服务监控与统计系统-监测到站点异常

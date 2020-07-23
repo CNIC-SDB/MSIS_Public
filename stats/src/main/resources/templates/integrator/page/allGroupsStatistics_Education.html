@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html
+        lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <title>数据服务监控与统计系统</title>
+</head>
+<body>
+<section class="container territoryVisit">
+    <div class="row">
+        <div class="loadingdiv" id="loading">
+            <img alt="图片加载中···" src="../img/preload.gif"/>
+        </div>
+        <div class="col-md-12">
+            <div class="panel panel-primary">
+                <div class="panel-heading">列表统计-科教用户统计</div>
+                <ul class="nav nav-pills nav-justified ar-nav-pills center-block margin-bottom">
+                    <li class=""><a class="href" href="#integrator/allGroupsStatistics?page=visit">访问量统计</a></li>
+                    <li class=""><a class="href" href="#integrator/allGroupsStatistics?page=bandwidth">下载量统计</a></li>
+                    <li class="active"><a>科教用户统计</a></li>
+                </ul>
+
+                <!--参数选择-->
+                <div class="panel-body" id="quarter">
+                    <div class="form-group">
+                        <label class="checkbox-inline">
+                            <input checked="checked" name="quarter" type="radio" value="year">
+                            本年
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="quarter-1">
+                            一季度
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="quarter-2">
+                            二季度
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="quarter-3">
+                            三季度
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="quarter-4">
+                            四季度
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="halfYear-1">
+                            上半年
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="quarter" type="radio" value="halfYear-2">
+                            下半年
+                        </label>
+                    </div>
+
+                    <strong>月份</strong>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="input-group date">
+                                <input class="form-control" id="datetimepicker101" type="text"/>
+                                <span class="input-group-addon"><span
+                                        class="glyphicon glyphicon-calendar"></span>
+                </span>
+                            </div>
+                        </div>
+                        <button class="btn btn-ar btn-primary" id="month" type="submit">查询</button>
+                    </div>
+
+                    <div class="" id="chooseMonth">
+                        自定义起始年月
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <div class="input-group date">
+                                        <input class="form-control" id="datetimepicker10" type="text"/>
+                                        <span class="input-group-addon"><span
+                                                class="glyphicon glyphicon-calendar"></span>
+                </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <div class="input-group date">
+                                        <input class="form-control" id="datetimepicker11" type="text"/>
+                                        <span class="input-group-addon"><span
+                                                class="glyphicon glyphicon-calendar"></span>
+                </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-ar btn-primary" id="customMonth" type="submit">查询</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <strong>用户统计</strong>
+                        <label class="checkbox-inline">
+                            <input checked="checked" name="hostType" type="radio" value="both">
+                            科教用户统计
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="hostType" type="radio" value="ac">
+                            科学院用户统计
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="hostType" type="radio" value="edu">
+                            教育网用户统计
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <strong>选择统计参数</strong>
+                        <label class="checkbox-inline">
+                            <input checked="checked" name="statisticField" type="radio" value="page">
+                            网页访问量
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="statisticField" type="radio" value="bandwidth">
+                            数据下载量
+                        </label>
+                    </div>
+
+                    <div class="form-group">
+                        <strong>选择排名方式</strong>
+                        <label class="checkbox-inline">
+                            <input checked="checked" name="sortField" type="radio" value="value">
+                            绝对值
+                        </label>
+                        <label class="checkbox-inline">
+                            <input name="sortField" type="radio" value="rate">
+                            比率
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!--逻辑站点排名-柱状图-->
+            <div class="panel panel-primary">
+                <div class="panel-heading chartTitle">排行榜</div>
+                <div class="panel-body">
+
+                    <!--绝对值 访问量-->
+                    <div class="charts" id="groupsRankChar-valuePage"
+                    ></div>
+                    <!--绝对值 下载量-->
+                    <div class="charts" id="groupsRankChar-valueBandwidth"
+                    ></div>
+                    <!--比率 访问量|下载量-->
+                    <div class="charts" id="groupsRankChar-rate"
+                    ></div>
+                    <!--图表无数据-->
+                    <div class="charts" id="chartIsNull" style="height: 50px; max-width: 100%; margin: 0 auto">
+                        <p>当前无数据</p>
+                    </div>
+                </div>
+            </div>
+
+            <!--逻辑站点排名明细信息-表格-->
+            <div class="panel panel-primary">
+                <div class="panel-heading">排行榜</div>
+                <div class="panel-body">
+                    <div class="height-20"></div>
+                    <table id="groupsRankTable"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</section>
+
+<script th:inline="javascript">
+
+    // 初始化时间插件
+    // 起始时间
+    let $datetimepickerBegin = $('#datetimepicker10');
+    let beginDate = new Date();
+    $datetimepickerBegin.datepicker({
+        minViewMode: 1, // 最小显示为月份
+        autoclose: true, // 自动关闭
+        endDate: new Date(),
+        format: 'yyyy/mm',
+        language: 'zh-CN'
+    }).on("changeDate", function (date) {
+        beginDate = date.date;
+        initDatetimepickerEnd();
+    });
+
+    // 截止时间
+    let $datetimepickerEnd = $('#datetimepicker11');
+    function initDatetimepickerEnd() {
+        $datetimepickerEnd.datepicker("destroy");
+        $datetimepickerEnd.val("");
+        $datetimepickerEnd.datepicker({
+            minViewMode: 1,
+            autoclose: true,
+            format: 'yyyy/mm',
+            language: 'zh-CN',
+            startDate: beginDate,
+            endDate: new Date(),
+            beforeShowMonth: function (date) {
+                var time = $datetimepickerBegin.val().split("\/");
+                if (date < new Date(time[0], time[1] - 1, 1)) {
+                    return false;
+                }
+            }
+        });
+    }
+    initDatetimepickerEnd();
+
+    // 单选月份
+    let $datetimepickerMonth = $('#datetimepicker101');
+    $datetimepickerMonth.datepicker({
+        endDate: new Date(),
+        minViewMode: 1,
+        autoclose: true,
+        format: 'yyyy/mm',
+        language: 'zh-CN'
+    });
+
+    // 初始化排行榜-柱状图
+    let $groupsRankCharValuePage = Highcharts.chart('groupsRankChar-valuePage', chartOption("page", "value"));
+    let $groupsRankCharValueBandwidth = Highcharts.chart('groupsRankChar-valueBandwidth', chartOption("bandwidth", "value"));
+    let $groupsRankCharRate = Highcharts.chart('groupsRankChar-rate', chartOption("", "tate"));
+    let $chartIsNull = $('#chartIsNull');
+
+    // 初始化明细表-表格
+    let $groupsRankTable = $("#groupsRankTable");
+
+    // radio统一事件
+    $("input[name='quarter'],input[name='statisticField'],input[name='sortField'],input[name='hostType']").on("change", function () {
+        let param = radio2Param();
+        sendAjax(param);
+    });
+
+    // 月份选择事件
+    $("#month").on("click", function () {
+        if ($datetimepickerMonth.val().length === 0) {
+            $.myNotify.warning("请选择一个月份！");
+            return;
+        }
+        let radioParam = radio2Param();
+        let date = msisAPP.selectTimeConvert($datetimepickerMonth.val());
+        let param = $.extend({}, radioParam, date);
+        sendAjax(param);
+    });
+
+    // 自定义事件段事件
+    $("#customMonth").on("click", function () {
+        if ($datetimepickerBegin.val().length === 0 || $datetimepickerEnd.val().length === 0) {
+            $.myNotify.warning("请选择完整时间！");
+            return;
+        }
+        let begin = msisAPP.selectTimeConvert($datetimepickerBegin.val())["begin"];
+        let end = msisAPP.selectTimeConvert($datetimepickerEnd.val())["end"];
+        let params = radio2Param();
+        params.begin = begin;
+        params.end = end;
+        sendAjax(params);
+    });
+
+    (function init() {
+        sendAjax(radio2Param());
+    }());
+
+    /**
+     * 转换radio参数
+     */
+    function radio2Param() {
+        let params = msisAPP.radioTimeConvert($("input[name='quarter']:checked").val());
+        params.statistic = $.trim($("input[name='statisticField']:checked").val());
+        params.sort = $.trim($("input[name='sortField']:checked").val());
+        params.rankType = $.trim($("input[name='hostType']:checked").val());
+        return params;
+    }
+
+    /**
+     * @param isPage 统计方式是否为网页访问量
+     * @param isValue 排名方式是否为绝对值
+     * @param result 查询结果
+     * */
+    function selectChart(isPage, isValue, result) {
+        let a = $.trim($("[name='statisticField']:checked").parent().text());
+        let b = $.trim($("[name='sortField']:checked").parent().text());
+        $(".chartTitle").text("排行榜-" + a + b);
+        $(".charts").hide();
+        if (result.chartData.chartSeries.length === 0) {
+            $chartIsNull.show();
+        } else {
+            if (isPage && isValue) {
+                $groupsRankCharValuePage.xAxis[0].setCategories(result.chartData.chartYAxisName);
+                $groupsRankCharValuePage.yAxis[0].setTitle({text: "网页访问量"});
+                $groupsRankCharValuePage.series[0].setData(result.chartData.chartSeries);
+                $($groupsRankCharValuePage.renderTo).show();
+            } else if (!isPage && isValue) {
+                $groupsRankCharValueBandwidth.xAxis[0].setCategories(result.chartData.chartYAxisName);
+                $groupsRankCharValueBandwidth.yAxis[0].setTitle({text: "数据下载量"});
+                $groupsRankCharValueBandwidth.series[0].setData(byte2MB(result.chartData.chartSeries));
+                $($groupsRankCharValueBandwidth.renderTo).show();
+            } else {
+                $groupsRankCharRate.xAxis[0].setCategories(result.chartData.chartYAxisName);
+                $groupsRankCharRate.yAxis[0].setTitle({text: "比率"});
+                $groupsRankCharRate.series[0].setData(result.chartData.chartSeries);
+                $($groupsRankCharRate.renderTo).show();
+            }
+        }
+    }
+
+    /**
+     * @param result 查询结果
+     * @param isPage 统计参数是否为网页访问量
+     * */
+    function refreshTable(result, isPage) {
+        $groupsRankTable.bootstrapTable("destroy");
+        $groupsRankTable.bootstrapTable({
+            data: result.tableData,
+            columns: tableOption(isPage === true ? "page" : "bandwidth")
+        });
+        msisAPP.numberFormat();
+    }
+
+    /**
+     * 实际请求
+     * @param data 时间段JSON
+     */
+    function sendAjax(data) {
+        if (msisAPP.jsonIsEmpty(data)) {
+            return false;
+        }
+        let isPage = data.statistic === "page";
+        let isValue = data.sort === "value";
+        $.ajax({
+            url: "/integrator/allGroupsStatistics/education",
+            type: "POST",
+            dataType: "JSON",
+            data: data,
+            success: function (result) {
+                // 选择渲染的图表
+                selectChart(isPage, isValue, result);
+                // 刷新排名明细表
+                refreshTable(result, isPage);
+            }
+
+        })
+    }
+
+    function chartOption(statistic, sort) {
+        let commonOption = {
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: null
+            },
+            tooltip: {
+                valueDecimals: 0,
+                formatter: function () {
+                    let _y = msisAPP.evolveNumber(this.y, "MB");
+                    _y = msisAPP.thousands(_y);
+                    let _html = "<b>站点：" + this.x + "</b><br/>" +
+                        "<b>下载量：" + _y + "MB</b>";
+                    return _html;
+                }
+            },
+            xAxis: {
+                categories: [],
+            },
+            plotOptions: {
+                bar: {
+                    dataLabels: {
+                        enabled: true,
+                        allowOverlap: true // 允许数据标签重叠
+                    },
+                    // pointWidth: 20
+                },
+                series: {
+                    events: {
+                        legendItemClick: function (e) {
+                            return false;
+                        }
+                    }
+                }
+            },
+            legend: {
+                align: 'right',
+                verticalAlign: 'top',
+                x: 0,
+                y: 0
+            },
+            series: [
+                {
+                    name: "站点",
+                    data: []
+                }
+            ]
+        };
+
+        if ("value" === sort) {
+            if ("page" === statistic) {
+                commonOption.tooltip.formatter = function () {
+                    let _y = msisAPP.thousands(this.y);
+                    return "<b>站点:" + this.x + "</b> <br/>" +
+                        "<b>访问人次:" + _y + "</b>"
+                }
+            } else {
+                commonOption.tooltip.formatter = function () {
+                    let _y = msisAPP.thousands(msisAPP.evolveNumber(this.y, "MB"));
+                    return "<b>站点:" + this.x + "</b> <br/>" +
+                        "<b>下载量:" + _y + "MB</b>"
+                }
+            }
+        } else {
+            commonOption.tooltip.formatter = function () {
+                return "<b>站点:" + this.x + "</b> <br/>" +
+                    "<b>比率:" + this.y + "%</b>"
+            }
+        }
+
+        return commonOption;
+    }
+
+    function tableOption(statistic) {
+        let arr = [{
+            title: '排名',//标题  可不加
+            align: 'center',
+            formatter: function (value, row, index) {
+                return index + 1;
+            }
+        }, {
+            field: 'name',
+            title: '数据站点名称',
+            valign: "middle",
+            align: 'center',
+            formatter: function (value, row, index) {
+                let a = '<a href=\'javascript:void(0)\' class=\'say_hi\'>' + value + '</a>';
+                return a;
+            },
+            events: {
+                'click .say_hi': function (e, value, row, index) {
+                    let href = '#integrator/dataStat/synthesize?groupID=' + row.id;
+                    $.myAdmin.loadContent(href);
+                    $("#groupsList").val(row.id);
+                    e.preventDefault();
+                }
+            }
+        }];
+
+        if ("page" === statistic) {
+            arr = arr.concat([{
+                field: 'ac',
+                title: '科技网',
+                valign: "middle",
+                align: 'center',
+                class: 'number-thousands'
+            }, {
+                field: 'edu',
+                title: '教育网',
+                valign: "middle",
+                align: 'center',
+                class: 'number-thousands'
+            }, {
+                field: 'both',
+                title: '科教网',
+                valign: "middle",
+                align: 'center',
+                class: 'number-thousands'
+            }, {
+                field: 'other',
+                title: '其他',
+                valign: "middle",
+                align: 'center',
+                class: 'number-thousands'
+            }])
+        } else {
+            arr = arr.concat([{
+                field: 'ac',
+                title: '科技网',
+                valign: "middle",
+                align: 'center',
+                class: 'number-MB'
+            }, {
+                field: 'edu',
+                title: '教育网',
+                valign: "middle",
+                align: 'center',
+                class: 'number-MB'
+            }, {
+                field: 'both',
+                title: '科教网',
+                valign: "middle",
+                align: 'center',
+                class: 'number-MB'
+            }, {
+                field: 'other',
+                title: '其他',
+                valign: "middle",
+                align: 'center',
+                class: 'number-MB'
+            }])
+        }
+        arr = arr.concat([{
+            field: 'rate',
+            title: '比率',
+            valign: "middle",
+            align: 'center',
+            class: 'number-thousands'
+        }]);
+        return arr;
+    }
+
+
+    function byte2MB(array) {
+        let seriesArr = [];
+        $.each(array, function (index, value) {
+            seriesArr.push(parseFloat(msisAPP.evolveNumber(value, "MB")));
+        });
+        return seriesArr;
+    }
+
+    msisAPP.numberFormat();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,20 @@
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:shiro="http://www.pollix.at/thymeleaf/shiro"
+>
+<body>
+<header class="main-header" th:fragment="header">
+    <!-- Logo -->
+    <!-- mini logo for sidebar mini 50x50 pixels -->
+    <span class="logo-mini"><b></b></span>
+    <!-- logo for regular state and mobile devices -->
+    <h1 class="page-title">数据服务监控与统计系统</h1>
+    <nav class="top-nav">
+        欢迎登录：<span id="username"><shiro:principal property="username"/></span>
+        <div class="dropdown animated  ">
+            <a class="dropdown-toggle" href="/manage/logout"><i class="fa fa-sign-out"></i> 退出</a>
+        </div> <!-- dropdown -->
+    </nav>
+</header>
+</body>
+</html>

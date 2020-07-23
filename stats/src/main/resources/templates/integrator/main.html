@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <title>数据服务监控与统计系统</title>
+    <!-- favicon icon -->
+    <link rel="icon" th:href="@{/static/favicon.ico}" type="image/x-icon">
+    <link rel="bookmark" th:href="@{/static/favicon.ico}" type="image/x-icon"/>
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
+    <!--jquery-->
+    <!--<script th:src="@{/static/bundles/jquery-3.4.1/jquery-3.4.1.min.js}"></script>-->
+    <script th:src="@{/static/bundles/jquery-3.4.1/jquery-3.4.1.js}"></script>
+    <!--bootstrap-->
+    <script th:src="@{/static/bundles/bootstrap-4.3.1/js/bootstrap.bundle.min.js}"></script>
+    <!--adminlte-->
+    <link rel="stylesheet" th:href="@{/static/bundles/AdminLTE-2.4.17/css/AdminLTE.css}"/>
+    <script th:src="@{/static/bundles/AdminLTE-2.4.17/js/adminlte.js}"></script>
+
+    <!--vendors-->
+    <link rel="stylesheet" th:href="@{/static/bundles/vendors/css/style-blue.css}"/>
+    <link rel="stylesheet" th:href="@{/static/bundles/vendors/css/custom.css}"/>
+    <link rel="stylesheet" th:href="@{/static/bundles/vendors/css/vendors.css}"/>
+    <script th:src="@{/static/bundles/vendors/js/vendors.js}"></script>
+
+    <!--jquery-validate-->
+    <link rel="stylesheet" th:href="@{/static/bundles/jquery-validation-1.19.1/css/cmxform.css}"/>
+    <script th:src="@{/static/bundles/jquery-validation-1.19.1/js/jquery.validate.min.js}"></script>
+    <!--bootstrap-table-->
+    <link rel="stylesheet" th:href="@{/static/bundles/bootstrap-table-1.15.4/css/bootstrap-table.css}"/>
+    <script th:src="@{/static/bundles/bootstrap-table-1.15.4/js/bootstrap-table.js}"></script>
+    <script th:src="@{/static/bundles/bootstrap-table-1.15.4/js/local/bootstrap-table-zh-CN.min.js}"></script>
+    <!--bootstrap-datepicker--->
+    <link rel="stylesheet" th:href="@{/static/bundles/bootstrap-datepicker-1.9.0/css/bootstrap-datepicker.css}"/>
+    <script th:src="@{/static/bundles/bootstrap-datepicker-1.9.0/js/bootstrap-datepicker.js}"></script>
+    <script th:src="@{/static/bundles/bootstrap-datepicker-1.9.0/locale/bootstrap-datepicker.zh-CN.min.js}"></script>
+    <!--bootstrap-datetimepicker--->
+    <link rel="stylesheet" th:href="@{/static/bundles/bootstrap-datetimepicker/css/bootstrap-datetimepicker.css}"/>
+    <script th:src="@{/static/bundles/bootstrap-datetimepicker/js/bootstrap-datetimepicker.js}"></script>
+    <script th:src="@{/static/bundles/bootstrap-datetimepicker/locale/bootstrap-datetimepicker.zh-CN.js}"></script>
+    <!--bootstrap-notify--->
+    <link rel="stylesheet" th:href="@{/static/bundles/bootstrap-notify-3.1.5/css/animate.css}"/>
+    <script th:src="@{/static/bundles/bootstrap-notify-3.1.5/js/bootstrap-notify.js}"></script>
+    <!--highcharts-7.1.2-->
+    <link rel="stylesheet" th:href="@{/static/bundles/highcharts-7.1.2/css/highcharts.css}"/>
+    <script th:src="@{/static/bundles/highcharts-7.1.2/js/highcharts.js}"></script>
+    <script th:src="@{/static/bundles/highcharts-7.1.2/js/no-data-to-display.js}"></script>
+    <!--自定义-->
+    <link rel="stylesheet" th:href="@{/static/bundles/msis/css/admin.css}"/>
+    <script th:src="@{/static/bundles/msis/js/msisapp.js}"></script>
+
+</head>
+<body class="gray">
+<div class="loadingdiv" id="layer">
+    <img alt="图片加载中···" src="../img/preload.gif"/>asdasd
+</div>
+<!-- Site wrapper -->
+<div id="sb-site">
+    <div class="boxed">
+        <!-- Content Wrapper. Contains page content -->
+        <div th:replace="~{integrator/content-header :: content-header}"></div>
+        <div id="content-wrapper">
+            <div th:replace="~{integrator/page/homePage :: content-wrapper}"></div>
+        </div>
+        <div th:replace="~{integrator/content-footer :: content-footer}"></div>
+    </div>
+</div>
+<!-- ./wrapper -->
+
+</body>
+
+<script th:src="@{/static/bundles/msis/js/admin.js}"></script>
+
+</html>

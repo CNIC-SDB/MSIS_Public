@@ -1,0 +1,406 @@
+body {
+    background-color: #dcdcdc !important;
+}
+
+#content-wrapper {
+    padding-top: 20px;
+    background-color: #dcdcdc;
+}
+
+.header-full {
+    background-image: url("/static/img/top_bg.png");
+}
+
+.header-full .header-right {
+    background: url("/static/img/top_right.png") top right no-repeat;
+}
+
+.header-full-title {
+    background-image: url("/static/img/logo.png");
+    height: 77px;
+    width: 275px;
+}
+
+header .container ul {
+    margin-left: 1%;
+}
+
+header .container ul select option, optgroup {
+    background-color: #1c839a;
+    /*padding-top: 20px;*/
+    color: #ffffff;
+}
+header .container ul li a {
+    height: 77px;
+    font-size: 16px;
+    color: #fff;
+    padding-top: 28px;
+    padding-left: 30px;
+    padding-right: 30px;
+}
+
+header .container ul li:last-child {
+    margin-left: 50px;
+    padding-top: 3%;
+}
+
+header .container ul li a:hover {
+    color: #2dcedf;
+    font-weight: bold;
+    border-bottom: #2dcedf 3px solid;
+    background-color: transparent;
+}
+
+header .container ul li a:focus {
+    color: #2dcedf;
+    font-weight: bold;
+    border-bottom: #2dcedf 3px solid;
+    background-color: transparent;
+}
+
+header .container .animated {
+    margin-top: 27px;
+}
+
+header .container .animated a {
+    font-size: 16px;
+    text-decoration: none;
+    color: #2ecbda;
+    float: right;
+}
+
+header .container .top-nav .dropdown-toggle {
+    color: #2ecbda;
+}
+
+header .container ul .select_div {
+    width: 300px;
+    background-color: #777777;
+    color: #ffffff;
+    /*opacity: 0.8;*/
+    border-radius: 0px;
+    height: 35px !important;
+}
+
+li {
+    list-style-type: none;
+}
+
+.ico01_div {
+    background: #a651a7;
+    height: 85px;
+    border-radius: 8px;
+    color: #FFF;
+    padding-left: 30px;
+    padding-top: 20px;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.ico02_div {
+    background: #10a8bf;
+    height: 85px;
+    border-radius: 8px;
+    color: #FFF;
+    padding-left: 30px;
+    padding-top: 20px;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.ico03_div {
+    background: #ef9c1a;
+    height: 85px;
+    border-radius: 8px;
+    color: #FFF;
+    padding-left: 30px;
+    padding-top: 20px;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.homePage .col-md-8 .panel-default .panel-heading {
+    color: #015c94;
+    font-size: 16px;
+}
+
+.homePage .col-md-4 .panel-default .panel-heading {
+    font-weight: bold;
+}
+
+.homePage .col-md-4 .panel-default .panel-body ul {
+    padding-left: 0px;
+}
+
+.homePage .col-md-4 .panel-default .panel-body ul a {
+    margin: 2px 2px;
+    text-decoration: none;
+    color: black;
+    margin-left: 10px;
+}
+
+.homePage .col-md-4 .panel-default .panel-body ul li span:first-of-type {
+    padding-top: 2px;
+    padding-left: 4px;
+    float: left;
+    color: white;
+    background: url("/static/img/ico04.4.png") no-repeat 0px -2px;
+    font-size: 11px;
+    width: 14px;
+    height: 24px;
+    display: block;
+}
+
+
+.homePage .col-md-4 .panel-default .panel-body ul:nth-child(1) li span {
+    background: url("/static/img/ico04.1.png") no-repeat 0px -2px;
+}
+
+.homePage .col-md-4 .panel-default .panel-body ul:nth-child(2) li span {
+    background: url("/static/img/ico04.2.png") no-repeat 0px -2px;
+}
+
+.homePage .col-md-4 .panel-default .panel-body ul:nth-child(3) li span {
+    background: url("/static/img/ico04.3.png") no-repeat 0px -2px;
+}
+
+
+.monitor .wrapper .collapse {
+    border-bottom: 1px solid;
+    margin-bottom: 15px;
+}
+
+.monitor .wrapper .collapse ul li:nth-of-type(4) {
+    display: inline-flex;
+    margin-top: 15px;
+}
+
+.monitor .wrapper .collapse .form-control {
+    width: 80%;
+    padding: 0px 12px;
+    height: 22px;
+}
+
+.loadingdiv {
+    position: absolute;
+    text-align: center;
+    left: 0px;
+    top: 0px;
+    z-index: 9999;
+    background-color: #000000;
+    opacity: 0.7; /*透明#CCCCCC*/
+    display: none;
+}
+
+/*加载中图片*/
+.loadingdiv img {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    z-index: 80;
+}
+
+.base .paper-back-full {
+    min-height: 757px;
+}
+
+.base .container .row .btn {
+    position: absolute;
+    top: 11%;
+    z-index: 66;
+}
+
+.base .side {
+    margin-left: 0px;
+}
+
+.base iframe {
+    min-height: 500px;
+}
+
+.base .page-title {
+    margin-left: 20px !important;
+}
+
+.base .content-wrapper .content-header .container {
+    width: 100%;
+}
+
+.base .wrapper .main-header {
+    margin-bottom: 10px;
+}
+
+.base .wrapper .main-header a:hover {
+    text-decoration: none;
+}
+
+.base .wrapper .main-header .fa-bars {
+    padding: 7px 0px;
+    font-size: 1em;
+    margin-right: 15px;
+}
+
+.base .content-wrapper .main-header {
+    margin-bottom: 0px;
+}
+
+.base .content-wrapper .breadcrumb {
+    margin-bottom: 0px;
+}
+
+.territoryVisit .form-group .checkbox-inline:first-child {
+    padding-left: 0px;
+}
+
+.panel-heading {
+    font-weight: bold;
+}
+.synthesize .panel-default .panel-heading:first-child {
+    background-color: #0099da;
+    font-weight: bold;
+    color: white;
+}
+
+.synthesize .table tbody tr:first-child td {
+    border-top: 0px;
+}
+
+.synthesize .table tbody td p {
+    margin: 0 0 0px;
+}
+
+.synthesize .table tbody td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.synthesize .nav-justified > li {
+    vertical-align: middle;
+    padding: 0px;
+}
+
+.synthesize .nav-justified > li > a {
+    display: inline-block;
+    vertical-align: middle;
+    height: 100%;
+    width: 100%;
+}
+
+.timeAnalyse .panel-primary .panel-heading {
+    font-weight: bold;
+    color: white;
+}
+
+.timeAnalyse .form-group .checkbox-inline:first-child {
+    padding-left: 0px;
+}
+
+.timeAnalyse .bootstrap-table .fixed-table-container .fixed-table-footer .table {
+    font-weight: bold;
+}
+
+.timeAnalyse .bootstrap-table .fixed-table-container .fixed-table-footer .table .fht-cell {
+    width: 170px !important;
+}
+
+.timeAnalyse .table tbody td p {
+    margin: 0 0 0px;
+}
+
+.timeAnalyse .table tbody tr:first-child td {
+    border-top: 0px;
+}
+
+.timeAnalyse .table tbody td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.fromAnalyse .form-group .checkbox-inline:first-child {
+    padding-left: 0px;
+}
+.naturalAnalyse .form-group .checkbox-inline:first-child {
+    padding-left: 0px;
+}
+
+.siteAnalyse .panel-body .detailed {
+    text-decoration: underline;
+}
+
+.siteAnalyse .panel-body .detailed span {
+    font-weight: bold;
+    color: white;
+    text-decoration: underline;
+}
+
+.siteAnalyse .panel-body .detailed:hover {
+    cursor: pointer;
+}
+
+.siteAnalyse .panel-body .detailed span:hover {
+    color: #333;
+    cursor: pointer;
+}
+.siteAnalyse .panel-body table {
+    width: 100%;
+    border: 1px solid #00c0ef;
+}
+
+.siteAnalyse .panel-body table tr:nth-child(odd) {
+    color: #0d6aad;
+    font-weight: bold;
+}
+
+.siteAnalyse .panel-body table td {
+    text-align: center;
+    border: 1px solid #00c0ef;
+    vertical-align: middle;
+}
+
+.siteAnalyseSite .table tr {
+    box-sizing: unset;
+    -webkit-box-sizing: unset;
+}
+
+.siteAnalyseSite .table th {
+    width: 60px;
+}
+
+.siteAnalyseSite .table th .th-inner {
+    white-space: initial !important;
+}
+
+.siteAnalyseSite .table .th-inner {
+    text-align: center;
+}
+
+.siteAnalyseSite .table .fht-cell {
+    text-align: center;
+}
+
+.siteAnalyseSite .table tbody td .icon-ar {
+    width: 20px;
+    height: 25px;
+    font-size: 12px;
+}
+
+.rateAnalyse .panel:nth-of-type(2) .panel-heading {
+    font-weight: bold;
+}
+
+.rateAnalyse .bootstrap-table .fixed-table-footer {
+    text-align: center;
+    font-weight: bold;
+}
+
+.groupId {
+    display: none;
+}
+
+#footer {
+    background: url("/static/img/foot_bg.png") top center;
+    color: #4de8ff;
+    text-align: center;
+    line-height: 45px;
+    font-size: 15px;
+}

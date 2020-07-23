@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <title>数据服务监控与统计系统</title>
+</head>
+<body>
+<section class="container siteAnalyseSite">
+    <div class="row">
+        <div class="col-md-12">
+            <strong class="groupId" id="groupId" style="float: right;display: none;"
+                    th:text="'?siteID='+${siteId}+'&groupID='+${groupId}"></strong>
+            <ul class="nav nav-pills nav-justified ar-nav-pills center-block margin-bottom">
+                <li><a class="href" href="#integrator/dataStat/synthesize">综合报告</a></li>
+                <li><a class="href" href='#integrator/dataStat/timeAnalyse'>时段分析</a></li>
+                <li><a class="href" href="#integrator/dataStat/fromAnalyse">来源分析</a></li>
+                <li><a class="href" href="#integrator/dataStat/naturalAnalyse">资源分析</a></li>
+                <li class="active"><a class="href" href="">站点状态监测</a></li>
+                <li><a class="href" href="#integrator/dataStat/rateAnalyse">服务正常率时段分析</a></li>
+            </ul>
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    监控站点状态明细
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="form-group">
+                                <div class="input-group date">
+                                    <input class="form-control" id="datetimepicker10" type="text"/>
+                                    <span class="input-group-addon"><span
+                                            class="glyphicon glyphicon-calendar"></span>
+                </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-ar btn-primary" id="chooseYearMonth" onclick="selectTimeTest();"
+                                    type="submit">查询
+                            </button>
+                        </div>
+
+                        <div class="col-md-5" style="padding-left: 9%">
+                            <span class="icon-ar icon-ar-warning"><span
+                                    class="glyphicon glyphicon-flash"></span></span>--链接等待
+
+                            <span class="icon-ar icon-ar-danger"><span
+                                    class="glyphicon glyphicon-remove"></span></span>--链接失败
+
+                            <span class="icon-ar icon-ar-success"><span
+                                    class="glyphicon glyphicon-ok"></span></span>--链接成功
+                        </div>
+
+                    </div>
+                    <div class="panel-body">
+                        <div class="panel">
+                            <div class="panel-heading">
+                                <strong id="siteName" th:text="${dataStatReport.getName()}+'的最新动态'"></strong><span
+                                    class="todayDate"
+                                    style="color: red;font-weight: bold"></span>
+                            </div>
+                            <div id="table"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="dataCharts"></div>
+            </div>
+        </div>
+    </div>
+        <script th:inline="javascript" type="text/javascript">
+            $(document).ready(function () {
+
+                // 初始化时间插件
+                var $datetimepickerBegin = $('#datetimepicker10');
+                var beginDate = new Date();
+                $datetimepickerBegin.datepicker({
+                    minViewMode: 1, // 最小显示为月份
+                    autoclose: true, // 自动关闭
+                    format: 'yyyy/mm',
+                    language: 'zh-CN'
+                }).on("changeDate", function (date) {
+                    beginDate = date.date;
+                });
+
+
+                var date = new Date();
+                    var y = date.getFullYear();
+                    var m = date.getMonth() + 1;
+                    $('.todayDate').text("(" + y + "年" + m + "月" + ")");
+                }
+            );
+
+
+            var GroupRate = [[${dataStatReport.siteStatusList}]];
+            if (GroupRate.length == 0) {
+                GroupRate = [0];
+            } else {
+                var arr = [];
+                var model = null;
+                $.each(GroupRate, function (index) {
+                    var dayTime = GroupRate[index].dayTime;
+                    var hourList = GroupRate[index].hours;
+                    if (hourList == null) {
+                        hourList = [];
+                    }
+                    var data1 = {};//定义一个json对象
+                    data1.dayTime = dayTime;
+                    //
+                    // for (var i=0;i<24;i++){
+                    //
+                    // }
+                    model = '{ "dayTime"' + ':' + dayTime + ',';
+                    $.each(hourList, function (ind) {
+                        var w = hourList[ind];
+                        model = model + '"' + ind + '":"' + hourList[ind] + '",';
+                    });
+                    model = model + '}';
+                    var obj = eval('(' + model + ')');
+                    arr.push(obj);
+                });
+                var resultList = arr;
+                var dynamicHeader = [];
+
+                dynamicHeader.push({
+                    field: 'dayTime',
+                    title: '日期',
+                    width: 60
+                });
+                for (var ind = 0; ind < 24; ind++) {
+                        dynamicHeader.push({
+                            field: ind,
+                            title: ind + '点',
+                            width: 10,
+                            formatter: function (value, row, index) {
+                                var a = "";
+                                if (value == 200) {
+                                    var a = '<span class="icon-ar icon-ar-success"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></span>';
+                                } else if (value == null) {
+                                    var a = '<span class="icon-ar icon-ar-warning"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span></span>';
+                                } else {
+                                    var a = '<span class="icon-ar icon-ar-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></span>';
+                                }
+                                return a;
+                            }
+                        });
+                }
+                // $.each(resultList[0], function (index) {
+                //
+                //     if (index != "dayTime") {
+                //         dynamicHeader.push({
+                //             field: index,
+                //             title: index + '点',
+                //             width: 10,
+                //             formatter: function (value, row, index) {
+                //                 var a = "";
+                //                 if (value == 200) {
+                //                     var a = '<span class="icon-ar icon-ar-success"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></span>';
+                //                 } else {
+                //                     var a = '<span class="icon-ar icon-ar-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></span>';
+                //                 }
+                //                 return a;
+                //             }
+                //         });
+                //     }
+                // });
+                $('#table').bootstrapTable({
+                    data: resultList,
+                    columns: dynamicHeader,
+                    showFooter: true,
+                    sortable: true,   //是否启用排序
+                });
+                $('#table').bootstrapTable('hideLoading');
+
+
+            }
+
+
+            function selectTimeTest() {
+                if ($('#datetimepicker10').val().length === 0) {
+                    $.myNotify.warning("请选择一个月份！");
+                    return;
+                }
+                var $datetimepickerBegin = $('#datetimepicker10');
+                var begin = msisAPP.selectTimeConvert($datetimepickerBegin.val());
+                var startDate = begin.begin;
+                var endDate = begin.end;
+                var groupsList = $("#groupsList option:selected");
+                var groupID = groupsList.val();
+                var orderBy = "hits";
+                selectData(groupID, startDate, endDate, orderBy);
+            };
+
+            function selectData(groupID, startDate, endDate, orderBy) {
+                var param = $("body .groupId").text();
+                var siteName = $("body #siteName").text();
+                var href = "../integrator/dataStat/siteAnalyse/site/getData" + param;
+                $.ajax({
+                    type: "POST",
+                    url: href,
+                    data: {"startDate": startDate, "endDate": endDate, "orderBy": orderBy, "siteName": siteName},
+                    dataType: "json",
+                    beforeSend: function () {
+                    },
+                    success: function (data) {
+                        $('#table').bootstrapTable('destroy');
+                        var GroupRate = data.siteStatusList == null ? [] : data.siteStatusList;
+                        if (GroupRate.length == 0) {
+                            GroupRate = [];
+                        }
+                        var arr = [];
+                        var model = null;
+                        $.each(GroupRate, function (index) {
+                            var dayTime = GroupRate[index].dayTime;
+                            var hourList = GroupRate[index].hours;
+                            if (hourList.length == 0) {
+                                hourList = [];
+                            }
+                            var data1 = {};//定义一个json对象
+                            data1.dayTime = dayTime;
+                            model = '{ "dayTime"' + ':' + dayTime + ',';
+                            $.each(hourList, function (ind) {
+                                var w = hourList[ind];
+                                model = model + '"' + ind + '":"' + hourList[ind] + '",';
+                            });
+                            model = model + '}';
+                            var obj = eval('(' + model + ')');
+                            arr.push(obj);
+                        });
+
+                        var resultList = arr;
+                        if (resultList[0] == null) {
+                            resultList[0] = [];
+                        }
+                        var dynamicHeader = [];
+
+                        dynamicHeader.push({
+                            field: 'dayTime',
+                            title: '日期'
+                        });
+                        for (var ind = 0; ind < 24; ind++) {
+                            //GroupRate = data.siteStatusList== null ? [] : data.siteStatusList
+                            dynamicHeader.push({
+                                field: ind,
+                                title: ind + '点',
+                                width: 20,
+                                formatter: function (value, row, index) {
+                                    var a = "";
+                                    if (value == 200) {
+                                        var a = '<span class="icon-ar icon-ar-success"><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></span>';
+                                    } else if (value == null) {
+                                        var a = '<span class="icon-ar icon-ar-warning"><span class="glyphicon glyphicon-flash" aria-hidden="true"></span></span>';
+                                    } else {
+                                        var a = '<span class="icon-ar icon-ar-danger"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span></span>';
+                                    }
+                                    return a;
+                                }
+                            });
+                        }
+                        $('#table').bootstrapTable({
+                            data: resultList,
+                            columns: dynamicHeader,
+                            showFooter: true,
+                            sortable: true,   //是否启用排序
+                        });
+                        $('#table').bootstrapTable('hideLoading');
+
+                        $('.todayDate').text("(" + startDate.substring(0, 4) + "年" + startDate.substring(4, 6) + "月" + ")");
+                    },
+                });
+            }
+        </script>
+</section>
+</body>
+</html>

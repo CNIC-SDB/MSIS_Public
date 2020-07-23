@@ -1,0 +1,72 @@
+<html
+        xmlns:th="http://www.thymeleaf.org">
+<body>
+<header class="hidden-xs header-full" th:fragment="content-header">
+    <div class="header-right">
+        <div class="container">
+            <div class="header-full-title">
+            </div>
+            <ul class="nav navbar-nav">
+                <li class=" jump">
+                    <a class="toggle" href="#integrator/homePage"><i class="fa fa-home"></i>首页</a>
+                </li>
+                <li class=" jump">
+                    <a class="dropdown-toggle" href="#integrator/territory"><i class="fa fa-area-chart"></i>领域统计</a>
+                </li>
+                <li class=" jump">
+                    <a class="dropdown-toggle" href="#integrator/allGroupsStatistics?page=visit"><i
+                            class="fa fa-pie-chart"></i>列表统计</a>
+                </li>
+                <li class="" style="line-height: 35px">
+                    <select class="form-control select_div" id="groupsList" style="height: 50px;line-height: 35px">
+                    </select>
+                </li>
+            </ul>
+            <div class="animated">
+                <a class="dropdown-toggle" href="/manage/"><i class="fa fa-user"></i> 登录</a>
+            </div> <!-- dropdown -->
+        </div>
+    </div>
+    <!-- container -->
+        <div class="container">
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        dropdownOpen();//调用
+                    });
+
+                    /**
+                     * 鼠标划过就展开子菜单，免得需要点击才能展开
+                     */
+                    function dropdownOpen() {
+                        var $dropdownLi = $('li.dropdown');
+                        $dropdownLi.mouseover(function () {
+                            $(this).addClass('open');
+                        }).mouseout(function () {
+                            $(this).removeClass('open');
+                        });
+                    }
+                </script>
+
+            </div>
+        </div>
+
+    <script th:inline="javascript">
+        msisAPP.groupsList();
+
+
+        $("#groupsList").on("change", function (e) {
+            var groupsList = $("#groupsList option:selected");
+            var groupID = groupsList.val();
+            var href = "#integrator/dataStat/synthesize?groupID=" + groupID;
+            if(groupID==0){
+                return 0;
+            }
+            $.myAdmin.loadContent(href);
+            e.preventDefault();
+        })
+    </script>
+</header>
+</body>
+</html>

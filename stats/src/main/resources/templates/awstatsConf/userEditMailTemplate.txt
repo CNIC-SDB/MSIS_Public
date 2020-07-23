@@ -1,0 +1,5 @@
+<p>[(${user.cnName})] [(${userTitle})]管理员您好：</p>
+<p>&nbsp;&nbsp;您<a href="[(${url})]">数据服务监控与统计系统</a>信息变更如下：</p>
+<p>&nbsp;&nbsp;登录账号为："[(${user.username})]",</p>
+<p>&nbsp;&nbsp;登录密码为："[(${user.password})]",</p>
+[# th:if="${user.mobile}!=null"]<p>&nbsp;&nbsp;预留手机号为："[(${user.mobile})]"</p>[/]

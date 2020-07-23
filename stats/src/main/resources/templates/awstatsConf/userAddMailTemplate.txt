@@ -1,0 +1,7 @@
+<p>[(${user.cnName})] [(${userTitle})]管理员您好：</p>
+<p>&nbsp;&nbsp;您在<a href="[(${url})]">数据服务监控与统计系统</a>初始化分配信息如下：</p>
+<p>&nbsp;&nbsp;登录账号为："[(${user.username})]",</p>
+<p>&nbsp;&nbsp;登录密码为："[(${user.transientPassword})]",此密码为初始密码，请您及时登录并修改密码，</p>
+<p>&nbsp;&nbsp;FTP账号为："[(${user.enName})]"</p>
+<p>&nbsp;&nbsp;FTP密码为："[(${ftpPassword})]"</p>
+[# th:if="${user.mobile}!=null"]<p>&nbsp;&nbsp;预留手机号为："[(${user.mobile})]"</p>[/]

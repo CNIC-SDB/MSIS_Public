@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+>
+<head>
+    <meta charset="utf-8">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <title>数据服务监控与统计系统</title>
+</head>
+<body>
+<section class="container siteAnalyse">
+    <div class="row">
+        <div class="col-md-12">
+            当前节点:<strong class="" id="groupSelect"></strong>
+            <div class="height-20"></div>
+            <strong class="" id="groupIdSelect" style="float: right;display: none"
+                    th:text="${dataStatReport.getId()}"></strong>
+            <script th:inline="javascript" type="text/javascript">
+                var selectVal = $("#groupIdSelect").text();
+                var objSel = $("header").find('#groupsList');
+                var text = null;
+                var ops = objSel.find("option");
+                for (var i = 0; i < ops.length; i++) {
+                    if (selectVal == ops[i].value) {
+                        text = ops[i].text;    //返回当前选定值对应的显示值
+                    }
+                }
+                $("#groupSelect").text(text);
+            </script>
+            <strong class="groupId" id="groupId" style="float: right"
+                    th:text="'?groupID='+${dataStatReport.getId()}"></strong>
+            <ul class="nav nav-pills nav-justified ar-nav-pills center-block margin-bottom">
+                <li><a class="href" href="#integrator/dataStat/synthesize">综合报告</a></li>
+                <li><a class="href" href='#integrator/dataStat/timeAnalyse'>时段分析</a></li>
+                <li><a class="href" href="#integrator/dataStat/fromAnalyse">来源分析</a></li>
+                <li><a class="href" href="#integrator/dataStat/naturalAnalyse">资源分析</a></li>
+                <li class="active"><a class="href" href="">站点状态监测</a></li>
+                <li><a class="href" href="#integrator/dataStat/rateAnalyse">服务正常率时段分析</a></li>
+            </ul>
+            <div class="panel panel-primary">
+                <div class="panel-heading">站点状态监测
+                </div>
+                <div class="panel-body"></div>
+                <div style="padding-left: 68.5%">
+                    <span class="icon-ar icon-ar-warning"><span
+                            class="glyphicon glyphicon-flash"></span></span>--链接等待
+
+                    <span class="icon-ar icon-ar-danger"><span
+                            class="glyphicon glyphicon-remove"></span></span>--链接失败
+
+                    <span class="icon-ar icon-ar-success"><span
+                            class="glyphicon glyphicon-ok"></span></span>--链接成功
+                </div>
+
+
+                <div class="panel-body" th:each="siteStat :${dataStatReport.siteStatusList}">
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <strong th:text="${siteStat.name}+'的最新动态'"></strong><span class="todayDate"
+                                                                                      style="color: red;font-weight: bold"></span>
+
+                            <div class="detailed" href="javascript:void(0)" style="float: right">
+                                <a class="GroupSite" style="display: none" target="_blank"
+                                   th:text="'?siteId='+${siteStat.id}+'&groupID='+${siteStat.gid}">
+                                </a>
+                                <span href="javascript:void(0)" style="text-decoration:underline">查看详细 >></span>
+                            </div>
+                        </div>
+                        <script th:inline="javascript" type="text/javascript">
+                            $("body .detailed").off('click').on("click", function () {
+                                var href = "#integrator/dataStat/siteAnalyse/site";
+                                var param = $(this).find('a').text();
+                                href = href + param;
+                                $.myAdmin.loadContent(href);
+                                window.open(href);
+                            })
+                        </script>
+                        <div class="panel-body">
+                            <table>
+                                <tr>
+                                    <td th:each="hour,a:${siteStat.hours}" th:if="${a.index} lt 12">
+                                        <span style="width: 10%" th:text="${a.index}+'点'"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td th:each="hour,a :${siteStat.hours}" th:if="${a.index} lt 12">
+                                        <span class="icon-ar icon-ar-warning" th:if="${hour.value} eq 999"><span
+                                                class="glyphicon glyphicon-flash"></span></span>
+
+                                        <span class="icon-ar icon-ar-danger"
+                                              th:if="${hour.value} neq 200 and ${hour.value} neq 999"><span
+                                                class="glyphicon glyphicon-remove"></span></span>
+
+                                        <span class="icon-ar icon-ar-success" th:if="${hour.value} eq 200"><span
+                                                class="glyphicon glyphicon-ok"></span></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td th:each="hour,a:${siteStat.hours}" th:if="${a.index} gt 11">
+                                        <span style="width: 10%" th:text="${a.index}+'点'"></span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td th:each="hour,a :${siteStat.hours}" th:if="${a.index} gt 11">
+                                        <span class="icon-ar icon-ar-warning" th:if="${hour.value} eq 999"><span
+                                                class="glyphicon glyphicon-flash"></span></span>
+
+                                        <span class="icon-ar icon-ar-danger"
+                                              th:if="${hour.value} neq 200 and ${hour.value} neq 999"><span
+                                                class="glyphicon glyphicon-remove"></span></span>
+
+                                        <span class="icon-ar icon-ar-success" th:if="${hour.value} eq 200"><span
+                                                class="glyphicon glyphicon-ok"></span></span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="dataChart">
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript" type="text/javascript">
+        $(document).ready(function () {
+                var date = new Date();
+                var y = date.getFullYear();
+                var m = date.getMonth() + 1;
+                var d = date.getDate();
+                $('.todayDate').text("(" + y + "-" + m + "-" + d + ")");
+
+                // var hour=$(".hourVal");
+                // for (var i=0;i<hour.length;i++) {
+                //     if(hour.text()=="200"){
+                //         $(".hourVal").text('hello');
+                //     }
+                //     else{
+                //         $(".hourVal").text('hi');
+                //     }
+                // }
+            }
+        );
+        // 服务正常率折线图
+        var GroupRate = [[${dataStatReport.groupRate}]];
+        $.each(GroupRate, function (index) {
+            var time = GroupRate[index][0];
+            var year = Math.floor(time / 10000);
+            var month = Math.floor(time % 10000 / 100);
+            var day = time % 10000 % 100;
+            var date = Date.UTC(year, month - 1, day);
+            GroupRate[index][0] = date;
+        });
+
+        Highcharts.chart('dataChart', {
+            chart: {
+                zoomType: 'x'
+            },
+            boost: {
+                useGPUTranslations: true
+            },
+            title: {
+                text: ''
+            },
+            xAxis: {
+                type: 'datetime',
+                title: {
+                    text: '日期'
+                },
+                labels: {
+                    step: 1,
+                    formatter: function () {
+                        return Highcharts.dateFormat('%Y-%m-%d', this.value);
+                    }
+                }
+
+            },
+            yAxis: {
+                title: {
+                    text: '服务正常率'
+                },
+                labels: {
+                    step: 1,
+                    formatter: function () {
+                        return Highcharts.numberFormat((this.value / 100), 2) + '%';
+                    }
+                }
+            },
+            tooltip: {
+                valueDecimals: 0,
+                formatter: function () {
+                    return '<b>' + Highcharts.dateFormat('%Y-%m-%d', this.x) + '</b><br/>' + '服务正常率:' + Highcharts.numberFormat((this.y) / 100, 0, '.', ',') + '%';
+                }
+            },
+            series: [{
+                type: 'line',
+                name: '服务正常率',
+                data: GroupRate,
+                lineWidth: 0.8
+            }]
+        });
+    </script>
+</section>
+</body>
+</html>
